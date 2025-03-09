@@ -117,12 +117,12 @@ public class MemberProfileController {
         );
     }
 
-    @GetMapping("/email")
-    public ResponseEntity<MemberProfileDTO> getMemberProfileByEmail(@RequestParam String email) {
-        MemberProfile memberProfile =  memberProfileService.getMemberProfileByEmail(email);
-        MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
-        return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
-    }
+//    @GetMapping("/email")
+//    public ResponseEntity<MemberProfileDTO> getMemberProfileByEmail(@RequestParam String email) {
+//        MemberProfile memberProfile =  memberProfileService.getMemberProfileByEmail(email);
+//        MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
+//        return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
+//    }
 
     @GetMapping("/birth-date")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfilesByDateOfBirth(

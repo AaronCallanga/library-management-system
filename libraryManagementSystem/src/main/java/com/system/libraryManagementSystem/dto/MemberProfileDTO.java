@@ -25,10 +25,6 @@ public class MemberProfileDTO {
     @Size(min = 2, max = 50, message = "Member's name must be between 2 to 50 characters")
     private String memberName;
 
-    @NotBlank(message = "Member's email must not be blank")
-    @Email(message = "Member's email must be valid and proper format: example@gmail.com")
-    private String email;
-
     @ContactNumber  //custom
     private String phoneNumber;
 

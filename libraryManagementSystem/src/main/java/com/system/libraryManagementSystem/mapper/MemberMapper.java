@@ -4,6 +4,7 @@ import com.system.libraryManagementSystem.dto.MemberDTO;
 import com.system.libraryManagementSystem.dto.format.BookTitleAuthorDTO;
 import com.system.libraryManagementSystem.model.Member;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,9 @@ public class MemberMapper {
 
         memberDTO.setId(member.getId());
         memberDTO.setName(member.getName());
+        memberDTO.setEmail(member.getEmail());
+        memberDTO.setEnabled(member.isEnabled());
+        memberDTO.setRoles(new HashSet<>(member.getRoles()));
 
         List<BookTitleAuthorDTO> borrowedBooks = member.getBorrowedBooks() == null ? List.of() :
                 member.getBorrowedBooks()
@@ -31,6 +35,9 @@ public class MemberMapper {
 
         member.setId(memberDTO.getId());
         member.setName(memberDTO.getName());
+        member.setEmail(memberDTO.getEmail());
+        member.setRoles(memberDTO.getRoles() != null ? new HashSet<>(memberDTO.getRoles()) : new HashSet<>());
+        member.setEnabled(memberDTO.isEnabled());
 
         return member;
     }

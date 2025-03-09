@@ -42,9 +42,9 @@ public class MemberProfileService {
     }
 
     public MemberProfile saveNewMemberProfile(MemberProfile memberProfile) {
-        if (memberProfileRepository.findMemberProfileByEmail(memberProfile.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("Email is already taken");
-        }
+//        if (memberProfileRepository.findMemberProfileByEmail(memberProfile.getEmail()).isPresent()) {
+//            throw new IllegalArgumentException("Email is already taken");
+//        }
         return memberProfileRepository.save(memberProfile);
     }
 
@@ -53,7 +53,7 @@ public class MemberProfileService {
         MemberProfile memberProfile = memberProfileRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
 
-        memberProfile.setEmail(updatedMemberProfile.getEmail());
+//        memberProfile.setEmail(updatedMemberProfile.getEmail());
         memberProfile.setAddress(updatedMemberProfile.getAddress());
         memberProfile.setPhoneNumber(updatedMemberProfile.getPhoneNumber());
         memberProfile.setDateOfBirth(updatedMemberProfile.getDateOfBirth());
@@ -94,10 +94,10 @@ public class MemberProfileService {
         return memberProfileRepository.findMemberProfileByAddress(address, pageRequest);
     }
 
-    public MemberProfile getMemberProfileByEmail(String email) {
-        return memberProfileRepository.findMemberProfileByEmail(email)
-                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
-    }
+//    public MemberProfile getMemberProfileByEmail(String email) {
+//        return memberProfileRepository.findMemberProfileByEmail(email)
+//                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
+//    }
 
     public Page<MemberProfile> findMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));

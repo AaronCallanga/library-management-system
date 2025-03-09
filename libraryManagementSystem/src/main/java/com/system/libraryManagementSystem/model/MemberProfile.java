@@ -18,10 +18,10 @@ public class MemberProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String email;
-
     private String phoneNumber;
+
+//    @Column(unique = true, nullable = false)
+//    private String email;
 
     private String address;
 
