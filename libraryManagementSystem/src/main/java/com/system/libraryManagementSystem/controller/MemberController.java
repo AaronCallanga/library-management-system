@@ -45,12 +45,12 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<MemberDTO> saveNewMember(@Valid @RequestBody MemberDTO memberDTO) {
-        Member member = MemberMapper.toEntity(memberDTO);
-        Member memberSaved = memberService.saveNewMember(member);
-        return new ResponseEntity<>(MemberMapper.toDTO(memberSaved), HttpStatus.CREATED);
-    }
+//    @PostMapping
+//    public ResponseEntity<MemberDTO> saveNewMember(@Valid @RequestBody MemberDTO memberDTO) {
+//        Member member = MemberMapper.toEntity(memberDTO);
+//        Member memberSaved = memberService.saveNewMember(member);
+//        return new ResponseEntity<>(MemberMapper.toDTO(memberSaved), HttpStatus.CREATED);
+//    }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<MemberDTO> updateMember(@Valid @RequestBody MemberDTO updatedMemberDTO) {

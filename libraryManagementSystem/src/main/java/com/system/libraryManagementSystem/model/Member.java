@@ -15,6 +15,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
+@Table(indexes = @Index(columnList = "email", unique = true))
 public class Member {
 
     @Id
@@ -31,13 +33,22 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)     //cascade allows us to create member without existing roles, and cascade will automatically persist the roles stated in member json data
     @JoinTable(
             name = "member_roles",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    private boolean isAccountNonExpired;
+
+    private boolean isAccountNonLocked;
+
+    private boolean isCredentialsNonExpired;
+
+
+
 
     @ManyToMany
     @JoinTable(

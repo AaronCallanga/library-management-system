@@ -16,7 +16,11 @@ public class MemberMapper {
         memberDTO.setId(member.getId());
         memberDTO.setName(member.getName());
         memberDTO.setEmail(member.getEmail());
+        memberDTO.setPassword("HIDDEN");
         memberDTO.setEnabled(member.isEnabled());
+        memberDTO.setAccountNonExpired(member.isAccountNonExpired());
+        memberDTO.setAccountNonLocked(member.isAccountNonLocked());
+        memberDTO.setCredentialsNonExpired(member.isCredentialsNonExpired());
         memberDTO.setRoles(new HashSet<>(member.getRoles()));
 
         List<BookTitleAuthorDTO> borrowedBooks = member.getBorrowedBooks() == null ? List.of() :
@@ -36,8 +40,9 @@ public class MemberMapper {
         member.setId(memberDTO.getId());
         member.setName(memberDTO.getName());
         member.setEmail(memberDTO.getEmail());
+        member.setPassword(memberDTO.getPassword());
         member.setRoles(memberDTO.getRoles() != null ? new HashSet<>(memberDTO.getRoles()) : new HashSet<>());
-        member.setEnabled(memberDTO.isEnabled());
+//        member.setEnabled(memberDTO.isEnabled());
 
         return member;
     }

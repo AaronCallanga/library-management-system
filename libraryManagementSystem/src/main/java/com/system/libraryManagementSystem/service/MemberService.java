@@ -40,9 +40,9 @@ public class MemberService {
         return fetchMemberById(id);
     }
 
-    public Member saveNewMember(Member member) {
-        return memberRepository.save(member);
-    }
+//    public Member saveNewMember(Member member) {
+//        return memberRepository.save(member);
+//    }
 
     @CachePut(cacheNames = "members", key = "#id")
     public Member updateMember(Long id, Member updatedMember) {
