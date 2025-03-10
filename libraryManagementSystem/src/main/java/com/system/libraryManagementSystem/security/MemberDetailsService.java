@@ -20,9 +20,9 @@ public class MemberDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Member not found with the email: " + email));
-        if (member.getRoles() == null) {
-            member.setRoles(new HashSet<>());
-        }
+//        if (member.getRoles() == null) {
+//            member.setRoles(new HashSet<>("ROLE_MEMBER"));
+//        }
         return new MemberDetails(member);
     }
 }

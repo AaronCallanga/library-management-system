@@ -11,8 +11,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -20,7 +24,7 @@ public class AuthService {
     @Autowired
     public MemberRepository memberRepository;
     @Autowired
-    PasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder;
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -29,19 +33,14 @@ public class AuthService {
             return "Email already in use";  //maybe create a Response format
         }
         if (member.getRoles() == null || member.getRoles().isEmpty()) {
-            return "User must have at least one role";
+            member.setRoles(new HashSet<>(List.of("ROLE_MEMBER")));
         }
-        String encodedPassword = passwordEncoder.encode(member.getPassword());
 
+        String encodedPassword = passwordEncoder.encode(member.getPassword());
         member.setPassword(encodedPassword);
-        member.setEnabled(true);
-        member.setAccountNonExpired(true);
-        member.setAccountNonLocked(true);
-        member.setCredentialsNonExpired(true);
 
 
         memberRepository.save(member);
-
         return "Member registered succesfully";
     }
 
@@ -59,7 +58,7 @@ public class AuthService {
         );
 
         if (authentication.isAuthenticated()) {
-            return "Login succesfully"; //jwt
+            return "Login succesfully"; //jwt       //try returning member details too to check its roles
         } else {
             throw new UsernameNotFoundException("Invalid Credentials");
         }

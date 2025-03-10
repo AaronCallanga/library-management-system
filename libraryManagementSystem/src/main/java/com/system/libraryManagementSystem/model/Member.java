@@ -1,6 +1,6 @@
 package com.system.libraryManagementSystem.model;
 
-import com.system.libraryManagementSystem.security.Role;
+//import com.system.libraryManagementSystem.security.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,13 +33,18 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)     //cascade allows us to create member without existing roles, and cascade will automatically persist the roles stated in member json data
-    @JoinTable(
-            name = "member_roles",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)     //cascade allows us to create member without existing roles, and cascade will automatically persist the roles stated in member json data
+//    @JoinTable(
+//            name = "member_roles",
+//            joinColumns = @JoinColumn(name = "member_id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id")
+//    )
+//    private Set<Role> roles = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_id"))
+    @Column(name = "role")
+    private Set<String> roles;
 
     private boolean isAccountNonExpired;
 

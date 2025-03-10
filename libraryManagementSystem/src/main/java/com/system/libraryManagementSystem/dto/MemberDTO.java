@@ -1,7 +1,7 @@
 package com.system.libraryManagementSystem.dto;
 
 import com.system.libraryManagementSystem.dto.format.BookTitleAuthorDTO;
-import com.system.libraryManagementSystem.security.Role;
+//import com.system.libraryManagementSystem.security.Role;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -39,7 +39,10 @@ public class MemberDTO {
     @NotNull(message = "Member's credentials expiration status must not be null")
     private Boolean credentialsNonExpired;
 
-    private Set<Role> roles = new HashSet<>();
+    private Set<String> roles;
+
+//    private Set<Role> roles = new HashSet<>();
+
 
     private List<BookTitleAuthorDTO> borrowedBooks;
 }
