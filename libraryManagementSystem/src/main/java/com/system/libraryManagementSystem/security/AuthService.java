@@ -3,16 +3,16 @@ package com.system.libraryManagementSystem.security;
 import com.system.libraryManagementSystem.exception.MemberNotFoundException;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.repository.MemberRepository;
+import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -27,6 +27,8 @@ public class AuthService {
     BCryptPasswordEncoder passwordEncoder;
     @Autowired
     AuthenticationManager authenticationManager;
+    @Autowired
+    private static JwtService jwtService;
 
     public String register(Member member) {
         if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
@@ -45,7 +47,6 @@ public class AuthService {
     }
 
     public String login(Member member) {
-//        System.out.println("Authentication successful for user: " + authentication.getName());
         Member dbMember = memberRepository.findByEmail(member.getEmail())
                 .orElseThrow(() -> new MemberNotFoundException("Member not found with the email: " + member.getEmail()));
 
@@ -58,10 +59,20 @@ public class AuthService {
         );
 
         if (authentication.isAuthenticated()) {
-            return "Login succesfully"; //jwt       //try returning member details too to check its roles
+            return jwtService.getToken(member.getEmail()); //jwt       //try returning member details too to check its roles
         } else {
             throw new UsernameNotFoundException("Invalid Credentials");
         }
 
     }
+
+//    public static String getCurrentUserEmail() {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (principal instanceof MemberDetails memberDetails) {
+//            return memberDetails.getUsername();
+//        } else if (principal instanceof String jwt) {
+//            return jwtService.extractEmail(jwt); // Assuming email is stored in "sub" claim
+//        }
+//        return null;
+//    }
 }

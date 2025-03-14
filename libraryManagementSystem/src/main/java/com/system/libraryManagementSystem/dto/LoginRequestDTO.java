@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class MemberLoginDTO {
+public class LoginRequestDTO {
 
     @NotBlank(message = "Member's email must not be blank")
     @Email(message = "Member's email must be valid and proper format: example@gmail.com")

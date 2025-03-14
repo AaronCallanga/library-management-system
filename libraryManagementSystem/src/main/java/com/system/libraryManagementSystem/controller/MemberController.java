@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,7 +53,8 @@ public class MemberController {
 //        return new ResponseEntity<>(MemberMapper.toDTO(memberSaved), HttpStatus.CREATED);
 //    }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
+//    @PreAuthorize("#updatedMemberDTO.email == authentication.principal.username")
     public ResponseEntity<MemberDTO> updateMember(@Valid @RequestBody MemberDTO updatedMemberDTO) {
         Member newMember = MemberMapper.toEntity(updatedMemberDTO);
         Member updatedMember = memberService.updateMember(newMember.getId(), newMember);

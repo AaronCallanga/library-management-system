@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 @Repository
 public interface BorrowingRecordRepository extends JpaRepository<BorrowingRecord, Long> {
 
-    @Query("SELECT br FROM BorrowingRecord br JOIN br.book b WHERE b.title LIKE %:title%")
+    @Query("SELECT br FROM BorrowingRecord br JOIN br.book b WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     Page<BorrowingRecord> findBorrowingRecordByBookTitle(String title, Pageable pageable);
-    @Query("SELECT br FROM BorrowingRecord br JOIN br.member m WHERE m.name LIKE %:name%")
+    @Query("SELECT br FROM BorrowingRecord br JOIN br.member m WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     Page<BorrowingRecord> findBorrowingRecordByMemberName(String name, Pageable pageable);
+    Page<BorrowingRecord> findByMemberEmail(String email, Pageable pageable);
     @Query("SELECT br FROM BorrowingRecord br WHERE br.borrowDate BETWEEN :startDate AND :endDate")
     Page<BorrowingRecord> findBorrowingRecordByBorrowDate(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);  //by date, optional time
     @Query("SELECT br FROM BorrowingRecord br WHERE br.returnDate BETWEEN :startDate AND :endDate")
