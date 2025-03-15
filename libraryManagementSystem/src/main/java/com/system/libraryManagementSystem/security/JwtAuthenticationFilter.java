@@ -26,11 +26,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authenticationHeader = request.getHeader("Authorization");
 
+        // Skip JWT validation for public endpoints
+//        if (request.getRequestURI().startsWith("/books") || request.getRequestURI().startsWith("/authors")) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+
         if (authenticationHeader == null || !authenticationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-
         String jwt = authenticationHeader.substring(7);
         String memberEmail = jwtService.extractEmail(jwt);
 
@@ -39,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (member != null && jwtService.isTokenValid(jwt)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        memberEmail, member.getPassword(), member.getAuthorities()
+                        member, null, member.getAuthorities()
                 );
 
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

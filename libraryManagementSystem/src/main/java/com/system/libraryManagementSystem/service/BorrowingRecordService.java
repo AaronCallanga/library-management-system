@@ -103,4 +103,10 @@ public class BorrowingRecordService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findBorrowingRecordByReturnDate(startDate, endDate, pageRequest);
     }
+//only admin and librarian
+//    public void approvedBorrowRequest(Long borrowingRecordId) {
+//        BorrowingRecord record = borrowingRecordRepository.findById(borrowingRecordId)
+//                .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + borrowingRecordId));
+//        record.setApproved(true);
+//    }
 }

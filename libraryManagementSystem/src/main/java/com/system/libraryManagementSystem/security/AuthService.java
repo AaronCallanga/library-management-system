@@ -28,7 +28,7 @@ public class AuthService {
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
-    private static JwtService jwtService;
+    private JwtService jwtService;
 
     public String register(Member member) {
         if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
@@ -57,6 +57,12 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(member.getEmail(), member.getPassword())
         );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Current User: " + auth.getName());
+        System.out.println("Authorities: " + auth.getAuthorities());
 
         if (authentication.isAuthenticated()) {
             return jwtService.getToken(member.getEmail()); //jwt       //try returning member details too to check its roles

@@ -27,7 +27,7 @@ public class SecurityConfig {
     // print out borrowing record transactions, word
     // add images for member profile
     //add bool field in the borrowed request, only admin and librarian can accept or reject the request. after accepting it the data will be persisted in the borrowing-record
-
+    //borrowing-record field       ,        boolean isApproved;
     @Autowired
     MemberDetailsService memberDetailsService;
     @Autowired
@@ -37,29 +37,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth                 //request matchers must be ordered as specific to general, to evaluate the specific one first
                         .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/books/", "/authors/", "/borrowing-record", "/members/**")
-                            .hasAnyRole("ADMIN", "LIBRARIAN")
-                        .requestMatchers(HttpMethod.POST, "/members/", "/member-profile/")
-                            .hasRole("ADMIN")      //admin can only create member, member-profile
-                        .requestMatchers(HttpMethod.GET, "/books/", "/books/**", "/authors/", "/authors/**", "/borrowing-record/", "/borrowing-record/**", "/member/", "/member-profile/", "/member/**", "/member-profile/**")
-                            .hasAnyRole("ADMIN", "LIBRARIAN")
-                        .requestMatchers(HttpMethod.DELETE, "/books/**")
-                            .hasAnyRole("ADMIN", "LIBRARIAN")
-                        .requestMatchers(HttpMethod.DELETE, "/authors/**", "/borrowing-record/**", "/members/**", "/member-profile/**")
-                            .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/books/", "/authors/")
-                            .hasAnyRole("ADMIN", "LIBRARIAN")
-                        .requestMatchers(HttpMethod.PUT, "/borrowing-record", "/members/", "/member-profile/")
-                            .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/members/**")
-                            .hasRole("MEMBER")
-                        .requestMatchers(HttpMethod.GET, "/borrowing-record/**")
-                            .hasRole("MEMBER")
-                        .requestMatchers(HttpMethod.PUT, "/member-profile/update", "/members/update")
-                            .hasRole("MEMBER")
-                        .requestMatchers(HttpMethod.GET, "/books/", "/authors/").hasRole("GUEST")
+                        .requestMatchers(HttpMethod.GET, "/books/**", "/authors/**").permitAll()                //guest
+
+                        //Members, Librarians, Admins
+                        .requestMatchers(HttpMethod.GET, "/members/**", "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")       //only view their own
+                        .requestMatchers(HttpMethod.PUT, "/members/**", "/member-profile/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")  //can request for books, which will be confirmed by admin or librarian only     //can post member-profile only for themselves
+
+                        //Librarians, Admins
+                        .requestMatchers(HttpMethod.POST, "/books/**", "/authors/**").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/books/**", "/authors/**", "/borrowing-record/**").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/books/**", "/authors/**").hasAnyRole("LIBRARIAN", "ADMIN")
+
+                        //Admins only
+                        .requestMatchers(HttpMethod.POST, "/members/**", "/member-profile").hasRole("ADMIN")
+                        .requestMatchers("/members/**", "/member-profile", "/borrowing-record/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
