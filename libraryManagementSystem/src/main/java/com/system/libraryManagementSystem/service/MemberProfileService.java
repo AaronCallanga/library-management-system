@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -94,7 +95,7 @@ public class MemberProfileService {
         return memberProfileRepository.findMemberProfileByAddress(address, pageRequest);
     }
 
-//    public MemberProfile getMemberProfileByEmail(String email) {
+//    public MemberProfile getMemberProfileByEmail(String email) {      getByMemberEmail
 //        return memberProfileRepository.findMemberProfileByEmail(email)
 //                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
 //    }
@@ -102,5 +103,11 @@ public class MemberProfileService {
     public Page<MemberProfile> findMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByDateOfBirth(startDate, endDate, pageRequest);
+    }
+
+    public boolean isMemberProfileOwner(Long id, Authentication authentication) {
+        return memberProfileRepository.findById(id)
+                .map(mp -> mp.getMember().getEmail().equals(authentication.getName()))
+                .orElse(false);
     }
 }

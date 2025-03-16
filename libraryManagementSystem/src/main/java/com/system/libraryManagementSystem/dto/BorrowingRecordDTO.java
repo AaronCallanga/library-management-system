@@ -7,6 +7,7 @@ import com.system.libraryManagementSystem.dto.validation.groups.OnCreate;
 import com.system.libraryManagementSystem.dto.validation.groups.OnUpdate;
 import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.model.Member;
+import jakarta.persistence.Entity;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -38,6 +39,10 @@ public class BorrowingRecordDTO {
     @Size(min = 2, max = 50, message = "Member's name must be between 2 to 50 characters")
     private String memberName;
 
+    @NotBlank(message = "Member's email must not be blank")
+    @Email(message = "Member's email must be valid and proper format: example@gmail.com")
+    private String memberEmail;
+
     @NotNull(message = "Date must not be blank to borrow")   //create a group, this should be inCreation group,  optional
     @PastOrPresent(message = "Date must be between now or in the past to borrow")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MMM-yyyy HH:mm:ss")
@@ -46,4 +51,7 @@ public class BorrowingRecordDTO {
 //    @NotNull(message = "Return date must not be blank") //create a group, this should be inUpdate group, optional
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MMM-yyyy HH:mm:ss")
     private LocalDateTime returnDate;
+
+
+    private boolean isApproved;
 }

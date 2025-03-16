@@ -10,10 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/members")
@@ -26,6 +25,7 @@ public class MemberController {
         this.memberService = memberService;
 
     }
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<MemberDTO>> getALlMembers(
             @RequestParam(defaultValue = "0") int page,
@@ -40,45 +40,77 @@ public class MemberController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<MemberDTO> getMemberById(@PathVariable Long id) {
         Member member = memberService.getMemberById(id);
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
-//    @PostMapping
-//    public ResponseEntity<MemberDTO> saveNewMember(@Valid @RequestBody MemberDTO memberDTO) {
-//        Member member = MemberMapper.toEntity(memberDTO);
-//        Member memberSaved = memberService.saveNewMember(member);
-//        return new ResponseEntity<>(MemberMapper.toDTO(memberSaved), HttpStatus.CREATED);
-//    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
+    public ResponseEntity<MemberDTO> saveNewMember(@Valid @RequestBody MemberDTO memberDTO) {
+        Member member = MemberMapper.toEntity(memberDTO);
+        Member memberSaved = memberService.saveNewMember(member);
+        return new ResponseEntity<>(MemberMapper.toDTO(memberSaved), HttpStatus.CREATED);
+    }
 
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
-//    @PreAuthorize("#updatedMemberDTO.email == authentication.principal.username")
     public ResponseEntity<MemberDTO> updateMember(@Valid @RequestBody MemberDTO updatedMemberDTO) {
         Member newMember = MemberMapper.toEntity(updatedMemberDTO);
         Member updatedMember = memberService.updateMember(newMember.getId(), newMember);
         return new ResponseEntity<>(MemberMapper.toDTO(updatedMember), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMemberById(@PathVariable Long id) {
         memberService.deleteMemberById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("@memberService.isMemberOwner(#id, authentication)")
+    @GetMapping("/current/{id}")
+    public ResponseEntity<MemberDTO> getOwnMemberDetails(@PathVariable Long id) {  //automatically inject Authentication object
+        Member member = memberService.getMemberById(id);
+        return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
+    }
+
+//    @PreAuthorize("#memberDTO.email == authentication.name") //pwede rin
+    @PreAuthorize("@memberService.isMemberOwner(#memberDTO.id, authentication)")
+    @PutMapping("/update/current")
+    public ResponseEntity<MemberDTO> updateOwnMemberDetails(@RequestBody MemberDTO memberDTO) {
+        Member member = MemberMapper.toEntity(memberDTO);
+        Member updatedMember = memberService.updateMember(member.getId(), member);
+
+        return new ResponseEntity<>(MemberMapper.toDTO(updatedMember), HttpStatus.OK);
+    }
+
+    // A member can only borrow or return books using their own account.
+// The borrowing process follows these steps:
+// 1. A borrowing request is first posted.
+// 2. After approval, the borrowing action can be executed.
+//
+// The authorization check ensures that only the owner of the account (memberId)
+// can perform borrowing and returning actions.
+    @PreAuthorize("@memberService.isMemberOwner(#memberId, authentication)")
     @PostMapping("/{memberId}/borrow/{bookId}")
     public ResponseEntity<MemberDTO> borrowBook(@PathVariable Long memberId, @PathVariable Long bookId) {
         Member member = memberService.borrowBook(memberId, bookId);
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @PreAuthorize("@memberService.isMemberOwner(#memberId, authentication)")
     @PostMapping("/{memberId}/return/{bookId}")
     public ResponseEntity<MemberDTO> returnBook(@PathVariable Long memberId, @PathVariable Long bookId) {
         Member member = memberService.returnBook(memberId, bookId);
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/name")
     public ResponseEntity<Page<MemberDTO>> getMemberByName(
             @RequestParam String name,
@@ -94,6 +126,7 @@ public class MemberController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<MemberDTO>> getMemberByBorrowedBookTitle(
             @RequestParam String bookTitle,

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -47,6 +48,7 @@ public class AuthorController {
         return new ResponseEntity<>(AuthorMapper.toDTO(author), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PostMapping
     public  ResponseEntity<AuthorDTO> saveNewAuthor(@Valid @RequestBody AuthorDTO authorDTO) {
         Author author = AuthorMapper.toEntity(authorDTO);
@@ -54,6 +56,7 @@ public class AuthorController {
         return new ResponseEntity<>(AuthorMapper.toDTO(savedAuthor), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<AuthorDTO> updateAuthor(@Valid @RequestBody AuthorDTO updatedAuthorDTO) { //baka no need na @PathVariable, just search using the id of the updatedAuthorDTO
         Author newAuthor = AuthorMapper.toEntity(updatedAuthorDTO);
@@ -61,6 +64,7 @@ public class AuthorController {
         return new ResponseEntity<>(AuthorMapper.toDTO(updatedAuthor), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAuthorById(@PathVariable Long id) {
         authorService.deleteAuthorById(id);

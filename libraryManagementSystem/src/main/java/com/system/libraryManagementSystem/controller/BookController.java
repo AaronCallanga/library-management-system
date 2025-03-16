@@ -5,12 +5,11 @@ import com.system.libraryManagementSystem.mapper.BookMapper;
 import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.service.BookService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -46,13 +45,15 @@ public class BookController {
         return new ResponseEntity<>(BookMapper.toDTO(book), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PostMapping
-    public ResponseEntity<BookDTO> saveNewBook(@Valid @Validated @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> saveNewBook(@Valid @RequestBody BookDTO bookDTO) {
         Book book = BookMapper.toEntity(bookDTO);
         Book savedBook = bookService.saveNewBook(book);
         return new ResponseEntity<>(BookMapper.toDTO(savedBook), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<BookDTO> updateBook(@Valid @RequestBody BookDTO updatedBookDTO) {
         Book newBook = BookMapper.toEntity(updatedBookDTO);
@@ -60,6 +61,7 @@ public class BookController {
         return new ResponseEntity<>(BookMapper.toDTO(updatedBook), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBookById(@PathVariable Long id) {
         bookService.deleteBookById(id);

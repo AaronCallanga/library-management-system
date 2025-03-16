@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 
@@ -40,9 +41,9 @@ public class MemberService {
         return fetchMemberById(id);
     }
 
-//    public Member saveNewMember(Member member) {
-//        return memberRepository.save(member);
-//    }
+    public Member saveNewMember(Member member) {
+        return memberRepository.save(member);
+    }
 
     @CachePut(cacheNames = "members", key = "#id")
     public Member updateMember(Long id, Member updatedMember) {
@@ -67,6 +68,7 @@ public class MemberService {
         return memberRepository.findMemberByBorrowedBookTitle(title, pageRequest);
     }
 
+    @CachePut(cacheNames = "members", key = "#memberId")
     public Member returnBook(Long memberId, Long bookId) {
         Member member = fetchMemberById(memberId);
         Book book = fetchBookById(bookId);
@@ -75,6 +77,7 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    @CachePut(cacheNames = "members", key = "#memberId")
     public Member borrowBook(Long memberId, Long bookId) {
         Member member = fetchMemberById(memberId);
         Book book = fetchBookById(bookId);
@@ -91,6 +94,12 @@ public class MemberService {
     public Book fetchBookById(Long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with the id: " + id));
+    }
+
+    public boolean isMemberOwner(Long id, Authentication authentication) {
+        return memberRepository.findById(id)
+                .map(member -> member.getEmail().equals(authentication.getName()))
+                .orElse(false);
     }
 
 }

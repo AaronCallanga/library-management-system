@@ -59,6 +59,11 @@ public class BorrowingRecordService {
         borrowingRecordRepository.deleteById(id);
     }
 
+    public Page<BorrowingRecord> getBorrowingRecordByMemberEmail(String email, int page, int size, String sortDirection, String sortField) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
+        return borrowingRecordRepository.findByMemberEmail(email, pageRequest);
+    }
+
     public Page<BorrowingRecord> getBorrowingRecordByBookTitle(String title, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findBorrowingRecordByBookTitle(title, pageRequest);
@@ -104,9 +109,11 @@ public class BorrowingRecordService {
         return borrowingRecordRepository.findBorrowingRecordByReturnDate(startDate, endDate, pageRequest);
     }
 //only admin and librarian
-//    public void approvedBorrowRequest(Long borrowingRecordId) {
-//        BorrowingRecord record = borrowingRecordRepository.findById(borrowingRecordId)
-//                .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + borrowingRecordId));
-//        record.setApproved(true);
-//    }
+    public void approveBorrowRequest(Long borrowingRecordId) {
+        BorrowingRecord record = borrowingRecordRepository.findById(borrowingRecordId)
+                .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + borrowingRecordId));
+        record.setApproved(true);
+        borrowingRecordRepository.save(record);
+    }
+
 }

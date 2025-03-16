@@ -1,8 +1,6 @@
 package com.system.libraryManagementSystem.controller;
 
 import com.system.libraryManagementSystem.dto.BorrowingRecordDTO;
-import com.system.libraryManagementSystem.dto.validation.groups.OnCreate;
-import com.system.libraryManagementSystem.dto.validation.groups.OnUpdate;
 import com.system.libraryManagementSystem.mapper.BorrowingRecordMapper;
 import com.system.libraryManagementSystem.model.BorrowingRecord;
 import com.system.libraryManagementSystem.service.BorrowingRecordService;
@@ -11,15 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/borrowing-record")
@@ -32,6 +29,7 @@ public class BorrowingRecordController {
         this.borrowingRecordService = borrowingRecordService;
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<BorrowingRecordDTO>> getAllBorrowingRecords(
             @RequestParam(defaultValue = "0") int page,
@@ -46,12 +44,14 @@ public class BorrowingRecordController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BorrowingRecordDTO> getBorrowingRecordById(@PathVariable Long id) {
         BorrowingRecord borrowingRecord = borrowingRecordService.getBorrowingRecordById(id);
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(borrowingRecord), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @PostMapping
     public ResponseEntity<BorrowingRecordDTO> saveNewBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO recordDTO) {
         BorrowingRecord borrowingRecord = BorrowingRecordMapper.toEntity(recordDTO);
@@ -59,6 +59,7 @@ public class BorrowingRecordController {
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(savedBorrowingRecord), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<BorrowingRecordDTO> updateBorrowingRecordDTO(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
         BorrowingRecord newBorrowingRecord = BorrowingRecordMapper.toEntity(updatedBorrowingRecordDTO);
@@ -66,12 +67,30 @@ public class BorrowingRecordController {
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(updatedBorrowingRecord), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBorrowingRecordById(@PathVariable Long id) {
         borrowingRecordService.deleteBorrowingRecordById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("authentication.name == #authentication.name") // Ensures user can only access their own records
+    @GetMapping("/current")
+    public ResponseEntity<Page<BorrowingRecordDTO>> getOwnBorrowingRecord(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
+            @RequestParam(defaultValue = "id") String sortField,
+            Authentication authentication
+    ) {
+        return new ResponseEntity<>(
+                borrowingRecordService.getBorrowingRecordByMemberEmail(authentication.getName(), page, size, sortDirection, sortField)
+                        .map(BorrowingRecordMapper::toDTO),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBookTitle(
             @RequestParam String title,
@@ -86,6 +105,8 @@ public class BorrowingRecordController {
                 HttpStatus.OK
         );
     }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByMemberName(
             @RequestParam String name,
@@ -101,6 +122,7 @@ public class BorrowingRecordController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/borrow-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBorrowDate(
             @RequestParam String borrowDate,
@@ -117,6 +139,7 @@ public class BorrowingRecordController {
                 );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/return-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordsByReturnDate(
             @RequestParam String returnDate,
@@ -131,6 +154,13 @@ public class BorrowingRecordController {
                         .map(BorrowingRecordMapper::toDTO),
                 HttpStatus.OK
         );
+    }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @PutMapping("/approve")
+    public ResponseEntity<String> approveBorrowRequest(@PathVariable Long id) {
+        borrowingRecordService.approveBorrowRequest(id);
+        return new ResponseEntity<>("Request has been approved", HttpStatus.ACCEPTED);
     }
 
     public LocalDateTime parseDateTime(String dateString) {

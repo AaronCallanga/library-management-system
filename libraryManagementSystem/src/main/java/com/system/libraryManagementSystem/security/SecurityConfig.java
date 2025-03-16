@@ -44,7 +44,7 @@ public class SecurityConfig {
                         //Members, Librarians, Admins
                         .requestMatchers(HttpMethod.GET, "/members/**", "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")       //only view their own
                         .requestMatchers(HttpMethod.PUT, "/members/**", "/member-profile/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")  //can request for books, which will be confirmed by admin or librarian only     //can post member-profile only for themselves
+                        .requestMatchers(HttpMethod.POST, "/member-profile/**", "/borrowing-record/**", "/members/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")  //can request for books, which will be confirmed by admin or librarian only     //can post member-profile only for themselves
 
                         //Librarians, Admins
                         .requestMatchers(HttpMethod.POST, "/books/**", "/authors/**").hasAnyRole("LIBRARIAN", "ADMIN")

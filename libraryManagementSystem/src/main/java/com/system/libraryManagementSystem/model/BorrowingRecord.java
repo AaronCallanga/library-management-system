@@ -35,4 +35,6 @@ public class BorrowingRecord {      //unidirectional, only the one who will hold
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MMM-yyyy HH:mm:ss")
     private LocalDateTime returnDate;
 
+    private boolean isApproved;
+
 }

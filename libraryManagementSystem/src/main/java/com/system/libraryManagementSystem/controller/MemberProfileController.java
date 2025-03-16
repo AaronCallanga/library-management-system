@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -18,8 +20,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/member-profile")
@@ -32,6 +33,7 @@ public class MemberProfileController {
         this.memberProfileService = memberProfileService;
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<MemberProfileDTO>> getAllMemberProfiles(
             @RequestParam(defaultValue = "0") int page,
@@ -46,19 +48,21 @@ public class MemberProfileController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<MemberProfileDTO> getMemberProfileById(@PathVariable Long id) {
         MemberProfile memberProfile = memberProfileService.getMemberProfileById(id);
         return new ResponseEntity<>(MemberProfileMapper.toDTO(memberProfile), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<MemberProfileDTO> updateMemberProfile(@Valid @RequestBody MemberProfileDTO updatedMemberProfileDTO) {
         MemberProfile newMemberProfile = MemberProfileMapper.toEntity(updatedMemberProfileDTO);
         MemberProfile updatedMemberProfile = memberProfileService.updateMemberProfile(newMemberProfile.getId(), newMemberProfile);
         return new ResponseEntity<>(MemberProfileMapper.toDTO(updatedMemberProfile), HttpStatus.OK);
     }
-
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") //can post in their own, create new api  because this is for admin and librarian
     @PostMapping
     public ResponseEntity<MemberProfileDTO> saveNewMemberProfile(@Valid @RequestBody MemberProfileDTO memberProfileDTO) {
         MemberProfile memberProfile = MemberProfileMapper.toEntity(memberProfileDTO);
@@ -66,12 +70,29 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(savedMemberProfile), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMemberProfileById(@PathVariable Long id) {
         memberProfileService.deleteMemberProfileById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("@memberProfileService.isMemberProfileOwner(#id, authentication)")
+    @GetMapping("/current/{id}")
+    public ResponseEntity<MemberProfileDTO> getOwnMemberProfile(@PathVariable Long id, Authentication authentication) {
+        MemberProfile memberProfile = memberProfileService.getMemberProfileById(id);
+        return new ResponseEntity<>(MemberProfileMapper.toDTO(memberProfile), HttpStatus.OK);
+    }
+
+    @PreAuthorize("@memberProfileService.isMemberProfileOwner(#memberProfileDTO.memberProfileId, authentication)")
+    @PutMapping("/update/current")
+    public ResponseEntity<MemberProfileDTO> updateOwnMemberProfile(@RequestBody MemberProfileDTO memberProfileDTO) {
+        MemberProfile memberProfile = MemberProfileMapper.toEntity(memberProfileDTO);
+        MemberProfile updatedMemberProfile = memberProfileService.updateMemberProfile(memberProfile.getId(), memberProfile);
+        return new ResponseEntity<>(MemberProfileMapper.toDTO(updatedMemberProfile), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByMemberName(
             @RequestParam String name,
@@ -87,6 +108,7 @@ public class MemberProfileController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/contact")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByPhoneNumber(
             @RequestParam String phoneNumber,
@@ -102,6 +124,7 @@ public class MemberProfileController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/address")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByAddress(
             @RequestParam String address,
@@ -117,13 +140,14 @@ public class MemberProfileController {
         );
     }
 
-//    @GetMapping("/email")
+//    @GetMapping("/email")     maybe getByMemberEmail
 //    public ResponseEntity<MemberProfileDTO> getMemberProfileByEmail(@RequestParam String email) {
 //        MemberProfile memberProfile =  memberProfileService.getMemberProfileByEmail(email);
 //        MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
 //        return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
 //    }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/birth-date")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfilesByDateOfBirth(
             @RequestParam String dateOfBirth,  // Can be year, year-month, or full date

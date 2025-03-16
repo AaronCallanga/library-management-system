@@ -38,6 +38,8 @@ public class BorrowingRecordMapper {
         borrowingRecordDTO.setBookTitle(borrowingRecord.getBook().getTitle());
         borrowingRecordDTO.setBorrowDate(borrowingRecord.getBorrowDate());
         borrowingRecordDTO.setReturnDate(borrowingRecord.getReturnDate());
+        borrowingRecordDTO.setApproved(borrowingRecord.isApproved());
+        borrowingRecordDTO.setMemberEmail(borrowingRecord.getMember().getEmail());
 
         return borrowingRecordDTO;
     }
@@ -62,6 +64,7 @@ public class BorrowingRecordMapper {
         borrowingRecord.setMember(member);
         borrowingRecord.setBorrowDate(borrowingRecordDTO.getBorrowDate());
         borrowingRecord.setReturnDate(borrowingRecordDTO.getReturnDate());
+        borrowingRecord.setApproved(borrowingRecordDTO.isApproved());
 
         return borrowingRecord;
     }
