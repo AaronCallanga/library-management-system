@@ -7,6 +7,7 @@ import com.system.libraryManagementSystem.model.MemberProfile;
 import com.system.libraryManagementSystem.repository.MemberProfileRepository;
 import com.system.libraryManagementSystem.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,9 +25,11 @@ public class MemberProfileService {
 
     @Autowired
     private MemberProfileRepository memberProfileRepository;
-
+    @Autowired
+    CacheManager cacheManager;
     @Autowired
     MemberRepository memberRepository;
+
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> getAllMemberProfiles(int page, int size, String sortDirection, String sortField) {
@@ -39,7 +42,7 @@ public class MemberProfileService {
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
-    @Cacheable(cacheNames = "member profiles", key = "#id")
+    @Cacheable(cacheNames = "member_profiles", key = "#id")
     public MemberProfile getMemberProfileById(Long id) {
         return memberProfileRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
@@ -51,7 +54,7 @@ public class MemberProfileService {
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
-    @CachePut(cacheNames = "member profiles", key = "#id")
+    @CachePut(cacheNames = "member_profiles", key = "#id")
     public MemberProfile updateMemberProfile(Long id, MemberProfile updatedMemberProfile) {
         MemberProfile memberProfile = memberProfileRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
@@ -61,23 +64,35 @@ public class MemberProfileService {
         memberProfile.setDateOfBirth(updatedMemberProfile.getDateOfBirth());
         memberProfile.setMember(updatedMemberProfile.getMember());
 
-        return memberProfileRepository.save(memberProfile);
+        // Save first!
+        MemberProfile savedProfile = memberProfileRepository.save(memberProfile);
+
+        // Then manually update cache using email
+        String email = updatedMemberProfile.getMember().getEmail();
+        if (email != null) {
+            cacheManager.getCache("member_profiles").put(email, savedProfile);
+        }
+
+        return savedProfile;
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
-    @CacheEvict(cacheNames = "member profiles", key = "#id")
+    @CacheEvict(cacheNames = "member_profiles", key = "#id")
     public void deleteMemberProfileById(Long id) {
 
         MemberProfile memberProfile = memberProfileRepository.findById(id)
                         .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the id: " + id));
 
         Member member = memberProfile.getMember();
+        String email = member.getEmail();
 
         if (member != null) {
             member.setMemberProfile(null); // This will trigger orphan removal
             memberRepository.save(member); // Save the member to apply changes
         }
-
+        if (email != null) {
+            cacheManager.getCache("member_profiles").evict(email);
+        }
         memberProfileRepository.deleteById(id);
 
     }
@@ -101,6 +116,7 @@ public class MemberProfileService {
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @Cacheable(cacheNames = "member_profiles", key = "#email")  //insert new cache value but with email as the key
     public MemberProfile getMemberProfileByMemberEmail(String email) {
         return memberProfileRepository.findMemberProfileByEmail(email)
                 .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
