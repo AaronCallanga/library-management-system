@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -72,15 +71,15 @@ public class MemberController {
     }
 
     @PreAuthorize("@memberService.isMemberOwner(#id, authentication)")
-    @GetMapping("/current/{id}")
-    public ResponseEntity<MemberDTO> getOwnMemberDetails(@PathVariable Long id) {  //automatically inject Authentication object
+    @GetMapping("/own/{id}")
+    public ResponseEntity<MemberDTO> getOwnMemberDetails(@PathVariable Long id) {  //automatically inject Authentication object, can use the email instead of id
         Member member = memberService.getMemberById(id);
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
 //    @PreAuthorize("#memberDTO.email == authentication.name") //pwede rin
     @PreAuthorize("@memberService.isMemberOwner(#memberDTO.id, authentication)")
-    @PutMapping("/update/current")
+    @PutMapping("/update/own")
     public ResponseEntity<MemberDTO> updateOwnMemberDetails(@RequestBody MemberDTO memberDTO) {
         Member member = MemberMapper.toEntity(memberDTO);
         Member updatedMember = memberService.updateMember(member.getId(), member);

@@ -5,6 +5,7 @@ import com.system.libraryManagementSystem.dto.MemberProfileDTO;
 import com.system.libraryManagementSystem.mapper.MemberProfileMapper;
 import com.system.libraryManagementSystem.model.MemberProfile;
 import com.system.libraryManagementSystem.service.MemberProfileService;
+import com.system.libraryManagementSystem.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,8 @@ public class MemberProfileController {
 
     @Autowired
     MemberProfileService memberProfileService;
+    @Autowired
+    MemberService memberService;
 
     public MemberProfileController(MemberProfileService memberProfileService) {
         this.memberProfileService = memberProfileService;
@@ -62,7 +65,7 @@ public class MemberProfileController {
         MemberProfile updatedMemberProfile = memberProfileService.updateMemberProfile(newMemberProfile.getId(), newMemberProfile);
         return new ResponseEntity<>(MemberProfileMapper.toDTO(updatedMemberProfile), HttpStatus.OK);
     }
-    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") //can post in their own, create new api  because this is for admin and librarian
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") //this is for admin and librarian
     @PostMapping
     public ResponseEntity<MemberProfileDTO> saveNewMemberProfile(@Valid @RequestBody MemberProfileDTO memberProfileDTO) {
         MemberProfile memberProfile = MemberProfileMapper.toEntity(memberProfileDTO);
@@ -77,15 +80,23 @@ public class MemberProfileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("@memberService.isMemberOwner(#memberProfileDTO.memberId, authentication)") //can create their own member profile
+    @PostMapping("/own")
+    public ResponseEntity<MemberProfileDTO> saveOwnMemberProfile(@Valid @RequestBody MemberProfileDTO memberProfileDTO) {
+        MemberProfile memberProfile = MemberProfileMapper.toEntity(memberProfileDTO);
+        MemberProfile savedMemberProfile = memberProfileService.saveNewMemberProfile(memberProfile);
+        return new ResponseEntity<>(MemberProfileMapper.toDTO(savedMemberProfile), HttpStatus.CREATED);
+    }
+
     @PreAuthorize("@memberProfileService.isMemberProfileOwner(#id, authentication)")
-    @GetMapping("/current/{id}")
-    public ResponseEntity<MemberProfileDTO> getOwnMemberProfile(@PathVariable Long id, Authentication authentication) {
+    @GetMapping("/own/{id}")
+    public ResponseEntity<MemberProfileDTO> getOwnMemberProfile(@PathVariable Long id, Authentication authentication) {     //maybe can use email instead of id
         MemberProfile memberProfile = memberProfileService.getMemberProfileById(id);
         return new ResponseEntity<>(MemberProfileMapper.toDTO(memberProfile), HttpStatus.OK);
     }
 
     @PreAuthorize("@memberProfileService.isMemberProfileOwner(#memberProfileDTO.memberProfileId, authentication)")
-    @PutMapping("/update/current")
+    @PutMapping("/update/own")
     public ResponseEntity<MemberProfileDTO> updateOwnMemberProfile(@RequestBody MemberProfileDTO memberProfileDTO) {
         MemberProfile memberProfile = MemberProfileMapper.toEntity(memberProfileDTO);
         MemberProfile updatedMemberProfile = memberProfileService.updateMemberProfile(memberProfile.getId(), memberProfile);
@@ -140,12 +151,13 @@ public class MemberProfileController {
         );
     }
 
-//    @GetMapping("/email")     maybe getByMemberEmail
-//    public ResponseEntity<MemberProfileDTO> getMemberProfileByEmail(@RequestParam String email) {
-//        MemberProfile memberProfile =  memberProfileService.getMemberProfileByEmail(email);
-//        MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
-//        return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
-//    }
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @GetMapping("/email")
+    public ResponseEntity<MemberProfileDTO> getMemberProfileByMemberEmail(@RequestParam String email) {
+        MemberProfile memberProfile =  memberProfileService.getMemberProfileByMemberEmail(email);
+        MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
+        return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
+    }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/birth-date")

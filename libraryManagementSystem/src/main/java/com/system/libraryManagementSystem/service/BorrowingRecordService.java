@@ -10,6 +10,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,7 @@ public class BorrowingRecordService {
     @Autowired
     private BorrowingRecordRepository borrowingRecordRepository;
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getAllBorrowingRecords(int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(
                 page,
@@ -31,16 +34,19 @@ public class BorrowingRecordService {
         return borrowingRecordRepository.findAll(pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @Cacheable(cacheNames = "borrowing records", key = "#id")
     public BorrowingRecord getBorrowingRecordById(Long id) {
         return borrowingRecordRepository.findById(id)
                 .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + id));
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     public BorrowingRecord saveNewBorrowingRecord(BorrowingRecord borrowingRecord) {
         return borrowingRecordRepository.save(borrowingRecord);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "borrowing records", key = "#id")
     public BorrowingRecord updateBorrowingRecord(Long id, BorrowingRecord updatedBorrowingRecord) {
         BorrowingRecord record = borrowingRecordRepository.findById(id)
@@ -54,26 +60,31 @@ public class BorrowingRecordService {
         return borrowingRecordRepository.save(record);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CacheEvict(cacheNames = "borrowing records", key = "#id")
     public void deleteBorrowingRecordById(Long id) {
         borrowingRecordRepository.deleteById(id);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getBorrowingRecordByMemberEmail(String email, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findByMemberEmail(email, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getBorrowingRecordByBookTitle(String title, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findBorrowingRecordByBookTitle(title, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getBorrowingRecordByMemberName(String name, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findBorrowingRecordByMemberName(name, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getBorrowingRecordByBorrowDate(LocalDateTime borrowDate, int page, int size, String sortDirection, String sortField) {
         LocalDateTime startDate;
         LocalDateTime endDate;
@@ -93,6 +104,7 @@ public class BorrowingRecordService {
         return borrowingRecordRepository.findBorrowingRecordByBorrowDate(startDate, endDate, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<BorrowingRecord> getBorrowingRecordByReturnDate(LocalDateTime returnDate, int page, int size, String sortDirection, String sortField) {
         LocalDateTime startDate;
         LocalDateTime endDate;
@@ -108,12 +120,19 @@ public class BorrowingRecordService {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return borrowingRecordRepository.findBorrowingRecordByReturnDate(startDate, endDate, pageRequest);
     }
-//only admin and librarian
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public void approveBorrowRequest(Long borrowingRecordId) {
         BorrowingRecord record = borrowingRecordRepository.findById(borrowingRecordId)
                 .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + borrowingRecordId));
         record.setApproved(true);
         borrowingRecordRepository.save(record);
+    }
+
+    public boolean isMemberOwnerOfTheRecord(Long borrowingRecordId, Authentication authentication) {
+
+        return borrowingRecordRepository.findById(borrowingRecordId)
+                .map(br -> br.getMember().getEmail().equals(authentication.getName()))
+                .orElse(false);
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/borrowing-record")
-public class BorrowingRecordController {
+public class BorrowingRecordController { //maybe you can also create a api end points where regular member can get their own record by id, title, return date
 
     @Autowired
     BorrowingRecordService borrowingRecordService;
@@ -51,9 +52,9 @@ public class BorrowingRecordController {
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(borrowingRecord), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PostMapping
-    public ResponseEntity<BorrowingRecordDTO> saveNewBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO recordDTO) {
+    public ResponseEntity<BorrowingRecordDTO> saveNewBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO recordDTO) {        //borrow request
         BorrowingRecord borrowingRecord = BorrowingRecordMapper.toEntity(recordDTO);
         BorrowingRecord savedBorrowingRecord = borrowingRecordService.saveNewBorrowingRecord(borrowingRecord);
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(savedBorrowingRecord), HttpStatus.CREATED);
@@ -75,7 +76,7 @@ public class BorrowingRecordController {
     }
 
     @PreAuthorize("authentication.name == #authentication.name") // Ensures user can only access their own records
-    @GetMapping("/current")
+    @GetMapping("/own")
     public ResponseEntity<Page<BorrowingRecordDTO>> getOwnBorrowingRecord(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -84,10 +85,34 @@ public class BorrowingRecordController {
             Authentication authentication
     ) {
         return new ResponseEntity<>(
+
                 borrowingRecordService.getBorrowingRecordByMemberEmail(authentication.getName(), page, size, sortDirection, sortField)
                         .map(BorrowingRecordMapper::toDTO),
                 HttpStatus.OK
         );
+    }
+
+    @PreAuthorize("#recordDTO.memberEmail == authentication.name")
+    @PostMapping("/request")
+    public ResponseEntity<BorrowingRecordDTO> sendOwnBorrowingRequest(@Valid @RequestBody BorrowingRecordDTO recordDTO) {        //borrow request
+        BorrowingRecord borrowingRecord = BorrowingRecordMapper.toEntity(recordDTO);
+        BorrowingRecord savedBorrowingRecord = borrowingRecordService.saveNewBorrowingRecord(borrowingRecord);
+        return new ResponseEntity<>(BorrowingRecordMapper.toDTO(savedBorrowingRecord), HttpStatus.CREATED);
+    }
+
+    @PreAuthorize("#updatedBorrowingRecordDTO.memberEmail == authentication.name")
+    @PutMapping("/update/own")
+    public ResponseEntity<BorrowingRecordDTO> updateOwnBorrowingRecordDTO(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
+        BorrowingRecord newBorrowingRecord = BorrowingRecordMapper.toEntity(updatedBorrowingRecordDTO);
+        BorrowingRecord updatedBorrowingRecord = borrowingRecordService.updateBorrowingRecord(newBorrowingRecord.getId(), newBorrowingRecord);
+        return new ResponseEntity<>(BorrowingRecordMapper.toDTO(updatedBorrowingRecord), HttpStatus.OK);
+    }
+
+    @PreAuthorize("@borrowingRecordService.isMemberOwnerOfTheRecord(#id, authentication)")
+    @DeleteMapping("/own/{id}")
+    public ResponseEntity<Void> deleteOwnBorrowingRecordById(@PathVariable Long id) {
+        borrowingRecordService.deleteBorrowingRecordById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
@@ -151,6 +176,22 @@ public class BorrowingRecordController {
         LocalDateTime parsedReturnDate = parseDateTime(returnDate);
         return new ResponseEntity<>(
                 borrowingRecordService.getBorrowingRecordByReturnDate(parsedReturnDate, page, size, sortDirection, sortField)
+                        .map(BorrowingRecordMapper::toDTO),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") // Ensures user can only access their own records
+    @GetMapping("/email")
+    public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByMemberEmail(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ASC") String sortDirection,
+            @RequestParam(defaultValue = "id") String sortField,
+            @RequestParam String email
+    ) {
+        return new ResponseEntity<>(
+                borrowingRecordService.getBorrowingRecordByMemberEmail(email, page, size, sortDirection, sortField)
                         .map(BorrowingRecordMapper::toDTO),
                 HttpStatus.OK
         );

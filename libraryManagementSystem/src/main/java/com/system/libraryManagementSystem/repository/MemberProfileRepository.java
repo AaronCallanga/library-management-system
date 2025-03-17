@@ -21,7 +21,7 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, Lo
     Page<MemberProfile> findMemberProfileByAddress(String address, Pageable pageable);
     @Query("SELECT mp FROM MemberProfile mp WHERE mp.dateOfBirth BETWEEN :startDate AND :endDate")
     Page<MemberProfile> findMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, Pageable pageable); //by year and by year-onth
-
-//    Optional<MemberProfile> findMemberProfileByEmail(String email);
+    @Query("SELECT mp FROM MemberProfile mp JOIN mp.member m WHERE m.email = :email")
+    Optional<MemberProfile> findMemberProfileByEmail(String email);
 
 }

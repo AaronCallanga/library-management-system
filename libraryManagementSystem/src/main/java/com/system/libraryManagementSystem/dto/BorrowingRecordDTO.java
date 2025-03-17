@@ -52,6 +52,6 @@ public class BorrowingRecordDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MMM-yyyy HH:mm:ss")
     private LocalDateTime returnDate;
 
-
+//automatic false if left empty
     private boolean isApproved;
 }

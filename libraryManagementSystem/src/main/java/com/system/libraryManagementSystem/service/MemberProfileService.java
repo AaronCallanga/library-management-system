@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,12 @@ import java.time.LocalDate;
 public class MemberProfileService {
 
     @Autowired
-    MemberProfileRepository memberProfileRepository;
+    private MemberProfileRepository memberProfileRepository;
 
     @Autowired
     MemberRepository memberRepository;
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> getAllMemberProfiles(int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(
                 page,
@@ -36,25 +38,24 @@ public class MemberProfileService {
         return memberProfileRepository.findAll(pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @Cacheable(cacheNames = "member profiles", key = "#id")
     public MemberProfile getMemberProfileById(Long id) {
         return memberProfileRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     public MemberProfile saveNewMemberProfile(MemberProfile memberProfile) {
-//        if (memberProfileRepository.findMemberProfileByEmail(memberProfile.getEmail()).isPresent()) {
-//            throw new IllegalArgumentException("Email is already taken");
-//        }
         return memberProfileRepository.save(memberProfile);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "member profiles", key = "#id")
     public MemberProfile updateMemberProfile(Long id, MemberProfile updatedMemberProfile) {
         MemberProfile memberProfile = memberProfileRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
 
-//        memberProfile.setEmail(updatedMemberProfile.getEmail());
         memberProfile.setAddress(updatedMemberProfile.getAddress());
         memberProfile.setPhoneNumber(updatedMemberProfile.getPhoneNumber());
         memberProfile.setDateOfBirth(updatedMemberProfile.getDateOfBirth());
@@ -63,6 +64,7 @@ public class MemberProfileService {
         return memberProfileRepository.save(memberProfile);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @CacheEvict(cacheNames = "member profiles", key = "#id")
     public void deleteMemberProfileById(Long id) {
 
@@ -80,26 +82,31 @@ public class MemberProfileService {
 
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> getMemberProfileByMemberName(String name, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByMemberName(name, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> getMemberProfileByPhoneNumber(String phoneNumber, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByPhoneNumber(phoneNumber, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> getMemberProfileByAddress(String address, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByAddress(address, pageRequest);
     }
 
-//    public MemberProfile getMemberProfileByEmail(String email) {      getByMemberEmail
-//        return memberProfileRepository.findMemberProfileByEmail(email)
-//                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
-//    }
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    public MemberProfile getMemberProfileByMemberEmail(String email) {
+        return memberProfileRepository.findMemberProfileByEmail(email)
+                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the email: " + email));
+    }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<MemberProfile> findMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByDateOfBirth(startDate, endDate, pageRequest);
@@ -110,4 +117,5 @@ public class MemberProfileService {
                 .map(mp -> mp.getMember().getEmail().equals(authentication.getName()))
                 .orElse(false);
     }
+
 }

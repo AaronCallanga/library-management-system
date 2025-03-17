@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,12 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     @Autowired
-    MemberRepository memberRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<Member> getAllMembers(int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(
                 page,
@@ -36,15 +38,18 @@ public class MemberService {
         return memberRepository.findAll(pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @Cacheable(cacheNames = "members", key = "#id")
     public Member getMemberById(Long id) {
         return fetchMemberById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public Member saveNewMember(Member member) {
         return memberRepository.save(member);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "members", key = "#id")
     public Member updateMember(Long id, Member updatedMember) {
         Member member = fetchMemberById(id);
@@ -53,21 +58,25 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @CacheEvict(cacheNames = "members", key = "#id")
     public void deleteMemberById(Long id) {
         memberRepository.deleteById(id);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<Member> getMemberByName(String name, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberRepository.findMemberByName(name, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<Member> getMemberByBorrowedBookTitle(String title, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberRepository.findMemberByBorrowedBookTitle(title, pageRequest);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "members", key = "#memberId")
     public Member returnBook(Long memberId, Long bookId) {
         Member member = fetchMemberById(memberId);
@@ -77,6 +86,7 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "members", key = "#memberId")
     public Member borrowBook(Long memberId, Long bookId) {
         Member member = fetchMemberById(memberId);

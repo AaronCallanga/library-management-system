@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class AuthorService {
 
     @Autowired
-    AuthorRepository authorRepository;
+    private AuthorRepository authorRepository;
 
     public Page<Author> getAllAuthors(int page, int size, String sortDirection, String sortField) {
 
@@ -37,10 +38,12 @@ public class AuthorService {
                 .orElseThrow(() -> new AuthorNotFoundException("Author not found with the id: " + id));
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Author saveNewAuthor(Author author) {
         return authorRepository.save(author);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "authors", key = "#id")  //if you passed the whole object only  without the Long id, you can use #updatedAuthor.id
     public Author updateAuthor(Long id, Author updatedAuthor) {
         Author author = authorRepository.findById(id)
@@ -54,6 +57,7 @@ public class AuthorService {
         return authorRepository.save(author);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @CacheEvict(cacheNames = "authors", key = "#id")
     public void deleteAuthorById(Long id) {
         authorRepository.deleteById(id);

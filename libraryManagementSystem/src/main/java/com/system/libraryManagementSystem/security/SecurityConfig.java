@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     //create api for user profile information, so a member can see his own borrowed books, profile, transactions etc, most likele you return response with jwt and its email/id/name that can be use to fetch in database and use the MemberService to fetch the data
     //Add exception handling for unauthorized access (e.g., custom AuthenticationEntryPoint).
@@ -43,8 +43,9 @@ public class SecurityConfig {
 
                         //Members, Librarians, Admins
                         .requestMatchers(HttpMethod.GET, "/members/**", "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")       //only view their own
-                        .requestMatchers(HttpMethod.PUT, "/members/**", "/member-profile/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/members/**", "/member-profile/**", "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/member-profile/**", "/borrowing-record/**", "/members/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")  //can request for books, which will be confirmed by admin or librarian only     //can post member-profile only for themselves
+                        .requestMatchers(HttpMethod.DELETE, "/borrowing-record/**").hasAnyRole("MEMBER", "LIBRARIAN", "ADMIN")
 
                         //Librarians, Admins
                         .requestMatchers(HttpMethod.POST, "/books/**", "/authors/**").hasAnyRole("LIBRARIAN", "ADMIN")

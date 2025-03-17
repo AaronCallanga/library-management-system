@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,10 +38,12 @@ public class BookService {
                 .orElseThrow(() -> new BookNotFoundException("Book not found with the id: " + id));
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Book saveNewBook(Book book) {
         return bookRepository.save(book);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @CachePut(cacheNames = "books", key = "#id")
     public Book updateBook(Long id, Book updatedBook) {
         Book book = bookRepository.findById(id)
@@ -56,6 +59,7 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @CacheEvict(cacheNames = "books", key = "#id")
     public void deleteBookById(Long id) {
         bookRepository.deleteById(id);
