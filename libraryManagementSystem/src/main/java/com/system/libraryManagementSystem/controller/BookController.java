@@ -70,7 +70,7 @@ public class BookController {
 
     @GetMapping("/title")
     public ResponseEntity<Page<BookDTO>> getBooksByTitle(
-            @RequestParam String title,
+            @RequestParam(defaultValue = "")String title,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -82,7 +82,7 @@ public class BookController {
 
     @GetMapping("/genre")
     public ResponseEntity<Page<BookDTO>> getBooksByGenre(
-            @RequestParam String genre,
+            @RequestParam(defaultValue = "") String genre,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -94,7 +94,7 @@ public class BookController {
 
     @GetMapping("/publication-year")
     public ResponseEntity<Page<BookDTO>> getBooksByPublicationYear(
-            @RequestParam int publicationYear,
+            @RequestParam(defaultValue = "") int publicationYear,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -106,7 +106,7 @@ public class BookController {
 
     @GetMapping("/authors-name")
     public ResponseEntity<Page<BookDTO>> getBooksByAuthorsName(
-            @RequestParam String authorsName,
+            @RequestParam(defaultValue = "") String authorsName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,

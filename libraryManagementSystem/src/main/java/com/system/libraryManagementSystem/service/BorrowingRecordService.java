@@ -52,6 +52,8 @@ public class BorrowingRecordService {
         BorrowingRecord record = borrowingRecordRepository.findById(id)
                 .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + id));
 
+        if (updatedBorrowingRecord.equals(record)) return updatedBorrowingRecord;
+
         record.setBook(updatedBorrowingRecord.getBook());
         record.setMember(updatedBorrowingRecord.getMember());
         record.setBorrowDate(updatedBorrowingRecord.getBorrowDate());

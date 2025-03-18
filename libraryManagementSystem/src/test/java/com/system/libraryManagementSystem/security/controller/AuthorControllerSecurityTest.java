@@ -1,6 +1,7 @@
 package com.system.libraryManagementSystem.security.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.system.libraryManagementSystem.dto.AuthorDTO;
 import com.system.libraryManagementSystem.model.Author;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.repository.AuthorRepository;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = true)
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class AuthorControllerSecurityTest {        //integration test, cause we are using the real controller when we interact with api which also uses real service and repository
     @Autowired
@@ -100,7 +101,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
     }
 
     @ParameterizedTest
-    @CsvSource({
+    @CsvSource({            //use csv source if you need more than one parameter in test like email, expectedStatus
             "admin@gmail.com, 200",
             "librarian@gmail.com, 200",
             "member@gmail.com, 200"
@@ -108,7 +109,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
         public void testGetAllAuthors_WhenAuthenticated_ShouldReturn200(String email, int expectedStatus) throws Exception {       //role is used for debugging
         String token = jwtService.getToken(email);
         mockMvc.perform(get("/authors")
-                        .header("Authorization", token))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().is(expectedStatus));
     }
 
@@ -190,7 +191,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
 
     @Test
     public void testSaveAuthors_WhenUnauthenticated_ShouldReturn403() throws Exception {
-        Author author2 = Author.builder()
+        AuthorDTO author2 = AuthorDTO.builder()
                 .name("J.K. Rowling")
                 .biography("British author best known for the Harry Potter series.")
                 .publishedBooks(new ArrayList<>())
@@ -206,7 +207,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
             "member@gmail.com, 403"
     })
     public void testSaveAuthors_WhenUnauthorized_ShouldReturn403(String email, int expectedStatus) throws Exception {
-        Author author2 = Author.builder()
+        AuthorDTO author2 = AuthorDTO.builder()
                 .name("J.K. Rowling")
                 .biography("British author best known for the Harry Potter series.")
                 .publishedBooks(new ArrayList<>())
@@ -227,7 +228,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
             "librarian@gmail.com, 201",
     })
     public void testSaveAuthors_WhenAuthorized_ShouldReturn201(String email, int expectedStatus) throws Exception {
-        Author author2 = Author.builder()
+        AuthorDTO author2 = AuthorDTO.builder()
                 .name("J.K. Rowling")
                 .biography("British author best known for the Harry Potter series.")
                 .publishedBooks(new ArrayList<>())
@@ -242,7 +243,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
 
     @Test
     public void testUpdateAuthor_WhenUnauthenticated_ShouldReturn403() throws Exception {
-        Author updatedAuthor = Author.builder()
+        AuthorDTO updatedAuthor = AuthorDTO.builder()
                 .id(author1.getId())
                 .name("J.K. Updated")
                 .biography("British author best known for the Harry Potter series.")
@@ -259,7 +260,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
             "member@gmail.com, 403"
     })
     public void testUpdateAuthor_WhenUnauthorized_ShouldReturn403(String email, int expectedStatus) throws Exception {
-        Author updatedAuthor = Author.builder()
+        AuthorDTO updatedAuthor = AuthorDTO.builder()
                 .id(author1.getId())
                 .name("J.K. Updated")
                 .biography("British author best known for the Harry Potter series.")
@@ -282,7 +283,7 @@ class AuthorControllerSecurityTest {        //integration test, cause we are usi
             "librarian@gmail.com, 201",
     })
     public void testUpdateAuthor_WhenAuthorized_ShouldReturn200(String email, int expectedStatus) throws Exception {
-        Author updatedAuthor = Author.builder()
+        AuthorDTO updatedAuthor = AuthorDTO.builder()
                 .id(author1.getId())
                 .name("J.K. Updated")
                 .biography("British author best known for the Harry Potter series.")

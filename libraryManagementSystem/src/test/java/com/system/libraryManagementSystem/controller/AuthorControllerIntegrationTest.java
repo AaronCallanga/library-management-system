@@ -1,6 +1,5 @@
 package com.system.libraryManagementSystem.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.libraryManagementSystem.dto.AuthorDTO;
 import com.system.libraryManagementSystem.model.Author;
