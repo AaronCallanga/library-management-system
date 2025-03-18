@@ -1,4 +1,4 @@
-package com.system.libraryManagementSystem.security;
+package com.system.libraryManagementSystem.security.utils;
 
 import io.jsonwebtoken.Jwts;
 import jakarta.xml.bind.DatatypeConverter;

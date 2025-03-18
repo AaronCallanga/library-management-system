@@ -102,6 +102,15 @@
 			<version>0.12.6</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-test -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<version>6.4.3</version>
+			<scope>test</scope>
+		</dependency>
+
+
 
 	</dependencies>
 

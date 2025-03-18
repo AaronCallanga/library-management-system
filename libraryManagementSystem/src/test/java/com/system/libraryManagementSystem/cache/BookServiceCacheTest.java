@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -46,6 +47,7 @@ public class BookServiceCacheTest {
         // Mock repository behavior
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
+
     }
 
     @Test
@@ -64,6 +66,7 @@ public class BookServiceCacheTest {
         assertNotNull(cacheManager.getCache("books").get(book.getId()));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void updateBook_ShouldUpdateCache() {
         Book newBook = new Book(1L, "Harry Potter 1", "Horror", 1997, author, null);
@@ -81,6 +84,7 @@ public class BookServiceCacheTest {
         verify(bookRepository, times(1)).findById(updatedBook.getId()); //ensures that the data is from the cache
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void deleteBookById_ShouldEvictCache() {
         bookService.getBookById(book.getId());

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,9 +25,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @SpringBootTest
 @ActiveProfiles("test")
 class AuthorControllerIntegrationTest {
@@ -103,6 +103,7 @@ class AuthorControllerIntegrationTest {
                 .andExpect(jsonPath("$.pageable.unpaged").value(false));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testSaveNewAuthor_ShouldReturnCreatedAuthor() throws Exception {
         AuthorDTO newAuthor =  AuthorDTO.builder()
@@ -118,6 +119,7 @@ class AuthorControllerIntegrationTest {
                 .andExpect(jsonPath("$.biography").value(newAuthor.getBiography()));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testUpdateAuthor_ShouldReturnUpdatedAuthor() throws Exception {
         AuthorDTO newAuthor = AuthorDTO.builder()
@@ -135,6 +137,7 @@ class AuthorControllerIntegrationTest {
                 .andExpect(jsonPath("$.biography").value(newAuthor.getBiography()));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testDeleteAuthor_ShouldReturnStatusNoContent() throws Exception {
         mockMvc.perform(delete("/authors/{id}", author1.getId()))

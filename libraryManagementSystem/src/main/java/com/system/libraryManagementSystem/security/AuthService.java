@@ -60,9 +60,9 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Current User: " + auth.getName());
-        System.out.println("Authorities: " + auth.getAuthorities());
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("Current User: " + auth.getName());
+//        System.out.println("Authorities: " + auth.getAuthorities());          //debugging
 
         if (authentication.isAuthenticated()) {
             return jwtService.getToken(member.getEmail()); //jwt       //try returning member details too to check its roles
@@ -71,14 +71,14 @@ public class AuthService {
         }
 
     }
-
-//    public static String getCurrentUserEmail() {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if (principal instanceof MemberDetails memberDetails) {
-//            return memberDetails.getUsername();
-//        } else if (principal instanceof String jwt) {
-//            return jwtService.extractEmail(jwt); // Assuming email is stored in "sub" claim
-//        }
-//        return null;
+//
+//    public String logout() {
+//
 //    }
+//
+//    public String forgotPassword(String email ) {
+//
+//    }
+
+
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -74,6 +75,7 @@ class AuthorServiceCacheTest {
 
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void updateAuthor_ShouldUpdateCache() {
         Author newAuthor = Author.builder()
@@ -100,6 +102,7 @@ class AuthorServiceCacheTest {
         verify(authorRepository, times(1)).findById(updatedAuthor.getId()); //ensures that the data is from the cache
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void deleteAuthorById_ShouldEvictCache() {
         assertNull(cacheManager.getCache("authors").get(author.getId()));

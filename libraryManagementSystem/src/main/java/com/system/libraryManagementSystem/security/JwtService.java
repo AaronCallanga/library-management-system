@@ -55,7 +55,7 @@ public class JwtService {
         return claims.getSubject();
     }
 
-    private Claims getPayload(String jwt) {
+    public Claims getPayload(String jwt) {
         return Jwts.parser()
                 .verifyWith(generateKey())
                 .build()

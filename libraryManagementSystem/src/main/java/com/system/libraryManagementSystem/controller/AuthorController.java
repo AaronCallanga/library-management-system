@@ -48,7 +48,7 @@ public class AuthorController {
         return new ResponseEntity<>(AuthorMapper.toDTO(author), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_LIBRARIAN') or hasAuthority('ROLE_ADMIN')")
     @PostMapping
     public  ResponseEntity<AuthorDTO> saveNewAuthor(@Valid @RequestBody AuthorDTO authorDTO) {
         Author author = AuthorMapper.toEntity(authorDTO);
@@ -73,7 +73,7 @@ public class AuthorController {
 
     @GetMapping("/published-book")
     public ResponseEntity<Page<AuthorDTO>> getAuthorByPublishedBookTitle(
-            @RequestParam String bookTitle,
+            @RequestParam(defaultValue = "") String bookTitle,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -88,7 +88,7 @@ public class AuthorController {
 
     @GetMapping("/name")
     public ResponseEntity<Page<AuthorDTO>> getAuthorsByName(
-            @RequestParam String name,
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -100,7 +100,7 @@ public class AuthorController {
 
     @GetMapping("/biography")
     public ResponseEntity<Page<AuthorDTO>> getAuthorsByBiography(
-            @RequestParam String keyword,
+            @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,

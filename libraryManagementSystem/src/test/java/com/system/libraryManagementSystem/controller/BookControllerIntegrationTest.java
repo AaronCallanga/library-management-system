@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -121,6 +122,7 @@ class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Book not found with the id: 99"));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testSaveNewBook_ShouldReturnCreatedBook() throws Exception {
         BookDTO newBook = BookDTO.builder()
@@ -141,6 +143,7 @@ class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.authorName").value(author1.getName()));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testUpdateBook_ShouldReturnUpdatedBook() throws Exception {
         BookDTO newBook = BookDTO.builder()
@@ -162,6 +165,7 @@ class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.authorName").value(author1.getName()));
     }
 
+    @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void testDeleteBooks_ShouldReturnStatusNoContent() throws Exception {
         mockMvc.perform(delete("/books/{id}", book1.getId()))
