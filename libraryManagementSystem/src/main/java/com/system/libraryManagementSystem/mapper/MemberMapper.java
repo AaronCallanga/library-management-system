@@ -21,7 +21,6 @@ public class MemberMapper {
         memberDTO.setAccountNonExpired(member.isAccountNonExpired());
         memberDTO.setAccountNonLocked(member.isAccountNonLocked());
         memberDTO.setCredentialsNonExpired(member.isCredentialsNonExpired());
-//        memberDTO.setRole(member.getRole());
         memberDTO.setRoles(new HashSet<>(member.getRoles()));
 
         List<BookTitleAuthorDTO> borrowedBooks = member.getBorrowedBooks() == null ? List.of() :
@@ -42,13 +41,11 @@ public class MemberMapper {
         member.setName(memberDTO.getName());
         member.setEmail(memberDTO.getEmail());
         member.setPassword(memberDTO.getPassword());
-//        member.setRole(memberDTO.getRole());
         member.setEnabled(memberDTO.getEnabled());
         member.setAccountNonLocked(memberDTO.getAccountNonLocked());
         member.setAccountNonExpired(memberDTO.getAccountNonExpired());
         member.setCredentialsNonExpired(memberDTO.getCredentialsNonExpired());
         member.setRoles(new HashSet<>(memberDTO.getRoles()));
-//        member.setRoles(memberDTO.getRoles() != null ? new HashSet<>(memberDTO.getRoles()) : new HashSet<>());
 
         return member;
     }

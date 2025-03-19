@@ -108,11 +108,24 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")       //for admin/librarian
+    @PostMapping("/authorized/{memberId}/borrow/{bookId}")
+    public ResponseEntity<MemberDTO> borrowBookWithAuthority(@PathVariable Long memberId, @PathVariable Long bookId) {
+        Member member = memberService.borrowBook(memberId, bookId);
+        return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
+    @PostMapping("/authorized/{memberId}/return/{bookId}")
+    public ResponseEntity<MemberDTO> returnBookWithAuthority(@PathVariable Long memberId, @PathVariable Long bookId) {
+        Member member = memberService.returnBook(memberId, bookId);
+        return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
+    }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/name")
     public ResponseEntity<Page<MemberDTO>> getMemberByName(
-            @RequestParam String name,
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,

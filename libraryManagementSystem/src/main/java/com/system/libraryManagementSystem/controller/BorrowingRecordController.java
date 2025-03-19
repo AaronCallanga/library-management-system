@@ -200,7 +200,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
-    @PutMapping("/approve")
+    @PutMapping("/approve/{id}")
     public ResponseEntity<String> approveBorrowRequest(@PathVariable Long id) {
         borrowingRecordService.approveBorrowRequest(id);
         return new ResponseEntity<>("Request has been approved", HttpStatus.ACCEPTED);

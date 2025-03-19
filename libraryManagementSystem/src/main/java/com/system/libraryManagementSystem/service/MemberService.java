@@ -16,7 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
 
 
 @Service
@@ -27,6 +30,9 @@ public class MemberService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     public Page<Member> getAllMembers(int page, int size, String sortDirection, String sortField) {
@@ -55,6 +61,15 @@ public class MemberService {
         Member member = fetchMemberById(id);
 
         member.setName(updatedMember.getName());
+        member.setEmail(updatedMember.getEmail());
+        if (!updatedMember.getPassword().startsWith("$2a$")) {  // bcrypt passwords start with "$2a$"
+            member.setPassword(passwordEncoder.encode(updatedMember.getPassword()));
+        }
+        member.setRoles(new HashSet<>(updatedMember.getRoles()));
+        member.setEnabled(updatedMember.isEnabled());
+        member.setAccountNonExpired(updatedMember.isAccountNonExpired());
+        member.setCredentialsNonExpired(updatedMember.isCredentialsNonExpired());
+        member.setAccountNonLocked(updatedMember.isAccountNonLocked());
         return memberRepository.save(member);
     }
 

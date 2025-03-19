@@ -631,4 +631,23 @@ class BorrowingRecordControllerSecurityTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void testApproveBorrowingRequest_WhenUnauthenticated_ShouldReturn403() throws Exception {
+        mockMvc.perform(put("/borrowing-record/approve/{id}", borrowingRecord1.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "member@gmail.com, 403",        //test in accessing other record not owned
+            "librarian@gmail.com, 202",
+            "admin@gmail.com, 202",
+    })
+    public void tesApproveBorrowingRequest_WhenAuthorizedOrUnauthorized_ShouldReturnExpectedStatusCode(String email, int expectedStatus) throws Exception {
+        String token = jwtService.getToken(email);
+        mockMvc.perform(put("/borrowing-record/approve/{id}", borrowingRecord1.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().is(expectedStatus));
+    }
+
 }
