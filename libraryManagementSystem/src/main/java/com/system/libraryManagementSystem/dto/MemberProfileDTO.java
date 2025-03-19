@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class MemberProfileDTO {
 
     private Long memberProfileId;

@@ -141,7 +141,7 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<MemberDTO>> getMemberByBorrowedBookTitle(
-            @RequestParam String bookTitle,
+            @RequestParam(defaultValue = "") String bookTitle,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,

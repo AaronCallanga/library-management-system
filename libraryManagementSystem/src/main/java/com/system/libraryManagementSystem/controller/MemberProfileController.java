@@ -106,7 +106,7 @@ public class MemberProfileController {
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByMemberName(
-            @RequestParam String name,
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -122,7 +122,7 @@ public class MemberProfileController {
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/contact")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByPhoneNumber(
-            @RequestParam String phoneNumber,
+            @RequestParam(defaultValue = "") String phoneNumber,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -138,7 +138,7 @@ public class MemberProfileController {
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/address")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByAddress(
-            @RequestParam String address,
+            @RequestParam(defaultValue = "") String address,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -153,7 +153,7 @@ public class MemberProfileController {
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/email")
-    public ResponseEntity<MemberProfileDTO> getMemberProfileByMemberEmail(@RequestParam String email) {
+    public ResponseEntity<MemberProfileDTO> getMemberProfileByMemberEmail(@RequestParam(defaultValue = "") String email) {
         MemberProfile memberProfile =  memberProfileService.getMemberProfileByMemberEmail(email);
         MemberProfileDTO memberProfileDTO = MemberProfileMapper.toDTO(memberProfile);
         return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
@@ -162,7 +162,7 @@ public class MemberProfileController {
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/birth-date")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfilesByDateOfBirth(
-            @RequestParam String dateOfBirth,  // Can be year, year-month, or full date
+            @RequestParam(defaultValue = "2025") String dateOfBirth,  // Can be year, year-month, or full date
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
