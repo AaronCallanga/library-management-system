@@ -118,7 +118,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBookTitle(
-            @RequestParam String title,
+            @RequestParam(defaultValue = "") String title,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -134,7 +134,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByMemberName(
-            @RequestParam String name,
+            @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
@@ -150,12 +150,13 @@ public class BorrowingRecordController { //maybe you can also create a api end p
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/borrow-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBorrowDate(
-            @RequestParam String borrowDate,
+            @RequestParam(defaultValue = "13-Feb-2025") String borrowDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(defaultValue = "id") String sortField
     ) {
+        //if (returnDate == null) returnDate = currentTime
         LocalDateTime parsedBorrowDate = parseDateTime(borrowDate);
         return new ResponseEntity<>(
                 borrowingRecordService.getBorrowingRecordByBorrowDate(parsedBorrowDate, page, size, sortDirection, sortField)
@@ -167,12 +168,13 @@ public class BorrowingRecordController { //maybe you can also create a api end p
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/return-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordsByReturnDate(
-            @RequestParam String returnDate,
+            @RequestParam(defaultValue = "13-Feb-2025") String returnDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(defaultValue = "id") String sortField
     ) {
+        //if (returnDate == null) returnDate = currentTime
         LocalDateTime parsedReturnDate = parseDateTime(returnDate);
         return new ResponseEntity<>(
                 borrowingRecordService.getBorrowingRecordByReturnDate(parsedReturnDate, page, size, sortDirection, sortField)
@@ -188,7 +190,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ASC") String sortDirection,
             @RequestParam(defaultValue = "id") String sortField,
-            @RequestParam String email
+            @RequestParam(defaultValue = "") String email
     ) {
         return new ResponseEntity<>(
                 borrowingRecordService.getBorrowingRecordByMemberEmail(email, page, size, sortDirection, sortField)

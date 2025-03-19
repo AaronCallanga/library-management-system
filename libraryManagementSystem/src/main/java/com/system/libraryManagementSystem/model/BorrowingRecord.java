@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class BorrowingRecord {      //unidirectional, only the one who will hold the relationship
 
     @Id

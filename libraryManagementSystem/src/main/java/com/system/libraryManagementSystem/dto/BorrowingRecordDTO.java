@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class BorrowingRecordDTO {
 
     private Long recordId;

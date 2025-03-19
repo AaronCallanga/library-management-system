@@ -64,7 +64,13 @@ class BookControllerSecurityTest {
                 .build();
         authorRepository.save(author1);
 
-        book1 = new Book(null, "Harry Potter and the Philosopher's Stone", "Fantasy", 1997, author1, new ArrayList<>());
+        book1 = Book.builder()
+                .title("Harry Potter and the Philosopher's Stone")
+                .genre("Fantasy")
+                .publicationYear(1997)
+                .author(author1)
+                .members(new ArrayList<>())
+                .build();
         bookRepository.saveAll(List.of(book1));
 
         Member member = Member.builder()
