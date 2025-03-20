@@ -35,7 +35,7 @@ public class BorrowingRecordService {
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
-    @Cacheable(cacheNames = "borrowing records", key = "#id")
+    @Cacheable(cacheNames = "borrowing_records", key = "#id")
     public BorrowingRecord getBorrowingRecordById(Long id) {
         return borrowingRecordRepository.findById(id)
                 .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + id));
@@ -47,7 +47,7 @@ public class BorrowingRecordService {
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
-    @CachePut(cacheNames = "borrowing records", key = "#id")
+    @CachePut(cacheNames = "borrowing_records", key = "#id")
     public BorrowingRecord updateBorrowingRecord(Long id, BorrowingRecord updatedBorrowingRecord) {
         BorrowingRecord record = borrowingRecordRepository.findById(id)
                 .orElseThrow(() -> new BorrowingRecordNotFound("Record not found with the id: " + id));
@@ -63,7 +63,7 @@ public class BorrowingRecordService {
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
-    @CacheEvict(cacheNames = "borrowing records", key = "#id")
+    @CacheEvict(cacheNames = "borrowing_records", key = "#id")
     public void deleteBorrowingRecordById(Long id) {
         borrowingRecordRepository.deleteById(id);
     }

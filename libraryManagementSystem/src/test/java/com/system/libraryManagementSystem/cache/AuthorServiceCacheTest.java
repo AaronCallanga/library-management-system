@@ -78,6 +78,7 @@ class AuthorServiceCacheTest {
     @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
     void updateAuthor_ShouldUpdateCache() {
+        assertNull(cacheManager.getCache("authors").get(author.getId()));
         Author newAuthor = Author.builder()
                 .id(1L)
                 .name("Updated Name")
