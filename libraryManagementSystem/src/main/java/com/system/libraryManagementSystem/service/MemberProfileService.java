@@ -45,7 +45,7 @@ public class MemberProfileService {
     @Cacheable(cacheNames = "member_profiles", key = "#id")
     public MemberProfile getMemberProfileById(Long id) {
         return memberProfileRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
+                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the id: " + id));
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")

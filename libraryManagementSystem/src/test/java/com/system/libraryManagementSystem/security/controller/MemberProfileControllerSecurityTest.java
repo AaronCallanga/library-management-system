@@ -2,12 +2,8 @@ package com.system.libraryManagementSystem.security.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.libraryManagementSystem.dto.MemberProfileDTO;
-import com.system.libraryManagementSystem.model.Author;
-import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.model.MemberProfile;
-import com.system.libraryManagementSystem.repository.AuthorRepository;
-import com.system.libraryManagementSystem.repository.BookRepository;
 import com.system.libraryManagementSystem.repository.MemberProfileRepository;
 import com.system.libraryManagementSystem.repository.MemberRepository;
 import com.system.libraryManagementSystem.security.JwtService;
