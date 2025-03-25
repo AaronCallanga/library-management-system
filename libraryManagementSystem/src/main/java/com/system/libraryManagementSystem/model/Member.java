@@ -4,6 +4,7 @@ package com.system.libraryManagementSystem.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,14 +34,6 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)     //cascade allows us to create member without existing roles, and cascade will automatically persist the roles stated in member json data
-//    @JoinTable(
-//            name = "member_roles",
-//            joinColumns = @JoinColumn(name = "member_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id")
-//    )
-//    private Set<Role> roles = new HashSet<>();
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "member_roles", joinColumns = @JoinColumn(name = "member_id"))
     @Column(name = "role")
@@ -52,16 +45,13 @@ public class Member {
 
     private boolean isCredentialsNonExpired;
 
-
-
-
     @ManyToMany
     @JoinTable(
             name = "member_book_borrowed",
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
-    private List<Book> borrowedBooks;
+    private List<Book> borrowedBooks = new ArrayList<>();
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)     //cascade = all operations must be cascaded to the memberProfile(child)
     private MemberProfile memberProfile;

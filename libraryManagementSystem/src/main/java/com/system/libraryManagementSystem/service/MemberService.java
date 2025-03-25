@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
@@ -97,7 +98,10 @@ public class MemberService {
         Member member = fetchMemberById(memberId);
         Book book = fetchBookById(bookId);
 
-        member.getBorrowedBooks().remove(book);
+        if (member.getBorrowedBooks() != null) {
+            member.getBorrowedBooks().remove(book);
+        }
+
         return memberRepository.save(member);
     }
 
@@ -106,6 +110,10 @@ public class MemberService {
     public Member borrowBook(Long memberId, Long bookId) {
         Member member = fetchMemberById(memberId);
         Book book = fetchBookById(bookId);
+
+        if (member.getBorrowedBooks() == null) {
+            member.setBorrowedBooks(new ArrayList<>()); // ✅ Ensure it is initialized
+        }
 
         member.getBorrowedBooks().add(book);
         return memberRepository.save(member);
