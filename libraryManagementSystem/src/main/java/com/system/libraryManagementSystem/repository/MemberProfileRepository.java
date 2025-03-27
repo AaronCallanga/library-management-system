@@ -24,4 +24,5 @@ public interface MemberProfileRepository extends JpaRepository<MemberProfile, Lo
     @Query("SELECT mp FROM MemberProfile mp JOIN mp.member m WHERE m.email = :email")
     Optional<MemberProfile> findMemberProfileByEmail(String email);
 
+    boolean existsByMemberId(Long memberId);
 }

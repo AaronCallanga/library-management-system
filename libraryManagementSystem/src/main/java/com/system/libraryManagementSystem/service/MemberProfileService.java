@@ -50,6 +50,13 @@ public class MemberProfileService {
 
     @PreAuthorize("hasAnyRole('MEMBER', 'LIBRARIAN', 'ADMIN')")
     public MemberProfile saveNewMemberProfile(MemberProfile memberProfile) {
+        Long memberId = memberProfile.getMember().getId();
+
+        // Check if the member already has a profile
+        if (memberProfileRepository.existsByMemberId(memberId)) {
+            throw new IllegalStateException("Member already has a profile.");
+        }
+
         return memberProfileRepository.save(memberProfile);
     }
 
@@ -57,7 +64,9 @@ public class MemberProfileService {
     @CachePut(cacheNames = "member_profiles", key = "#id")
     public MemberProfile updateMemberProfile(Long id, MemberProfile updatedMemberProfile) {
         MemberProfile memberProfile = memberProfileRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("Member profile not found with the id: " + id));
+                .orElseThrow(() -> new MemberProfileNotFoundException("Member profile not found with the id: " + id));
+
+        if (updatedMemberProfile.equals(memberProfile)) return updatedMemberProfile;
 
         memberProfile.setAddress(updatedMemberProfile.getAddress());
         memberProfile.setPhoneNumber(updatedMemberProfile.getPhoneNumber());
@@ -123,7 +132,7 @@ public class MemberProfileService {
     }
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
-    public Page<MemberProfile> findMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, int page, int size, String sortDirection, String sortField) {
+    public Page<MemberProfile> getMemberProfileByDateOfBirth(LocalDate startDate, LocalDate endDate, int page, int size, String sortDirection, String sortField) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortField));
         return memberProfileRepository.findMemberProfileByDateOfBirth(startDate, endDate, pageRequest);
     }

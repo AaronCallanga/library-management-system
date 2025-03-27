@@ -5,7 +5,6 @@ import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.model.BorrowingRecord;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.repository.BorrowingRecordRepository;
-import com.system.libraryManagementSystem.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,16 +26,13 @@ import static org.mockito.Mockito.*;
 class BorrowingRecordServiceTest {
 
     @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
     private BorrowingRecordRepository borrowingRecordRepository;
 
     @Mock
     private Authentication authentication;
 
     @InjectMocks
-    private BorrowingRecordService borrowingRecordService;  // The class containing isMemberOwnerOfTheRecord
+    private BorrowingRecordService borrowingRecordService;
 
     private BorrowingRecord record1;
     private BorrowingRecord record2;
@@ -193,7 +188,7 @@ class BorrowingRecordServiceTest {
 
         when(borrowingRecordRepository.findById(99L)).thenReturn(Optional.empty());
 
-        BorrowingRecordNotFound result = assertThrows(BorrowingRecordNotFound.class, () -> borrowingRecordService.getBorrowingRecordById(99L));
+        BorrowingRecordNotFound result = assertThrows(BorrowingRecordNotFound.class, () -> borrowingRecordService.updateBorrowingRecord(99L, updatedRecord));
 
         assertNotNull(result);
         assertEquals("Record not found with the id: 99", result.getMessage());
@@ -202,7 +197,7 @@ class BorrowingRecordServiceTest {
     }
 
     @Test
-    void deleteBorrowingRecordById() {
+    void deleteBorrowingRecordById_WhenRecordExist_ShouldDeleteSuccesfully() {
         doNothing().when(borrowingRecordRepository).deleteById(record1.getId());
 
         borrowingRecordService.deleteBorrowingRecordById(record1.getId());
@@ -268,9 +263,9 @@ class BorrowingRecordServiceTest {
 
     @Test
     void testIsMemberOwnerOfTheRecord_ReturnsFalse_WhenRecordNotFound() {
-        when(borrowingRecordRepository.findById(1L)).thenReturn(Optional.empty());
+        when(borrowingRecordRepository.findById(99L)).thenReturn(Optional.empty());
 
-        boolean result = borrowingRecordService.isMemberOwnerOfTheRecord(1L, authentication);
+        boolean result = borrowingRecordService.isMemberOwnerOfTheRecord(99L, authentication);
 
         assertFalse(result);
     }

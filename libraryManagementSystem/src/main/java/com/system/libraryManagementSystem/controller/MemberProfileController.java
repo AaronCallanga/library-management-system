@@ -174,7 +174,7 @@ public class MemberProfileController {
         LocalDate endDate = dateRange.getSecond();
 
         Page<MemberProfileDTO> memberProfiles = memberProfileService
-                .findMemberProfileByDateOfBirth(startDate, endDate, page, size, sortDirection, sortField)
+                .getMemberProfileByDateOfBirth(startDate, endDate, page, size, sortDirection, sortField)
                 .map(MemberProfileMapper::toDTO);
 
         return new ResponseEntity<>(memberProfiles, HttpStatus.OK);
