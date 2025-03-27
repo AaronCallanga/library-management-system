@@ -32,6 +32,12 @@ public class MemberService {
     @Autowired
     private BookRepository bookRepository;
 
+    public MemberService(MemberRepository memberRepository, BookRepository bookRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.memberRepository = memberRepository;
+        this.bookRepository = bookRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
 
@@ -61,10 +67,14 @@ public class MemberService {
     public Member updateMember(Long id, Member updatedMember) {
         Member member = fetchMemberById(id);
 
+        if (updatedMember.equals(member)) return updatedMember;
+
         member.setName(updatedMember.getName());
         member.setEmail(updatedMember.getEmail());
         if (!updatedMember.getPassword().startsWith("$2a$")) {  // bcrypt passwords start with "$2a$"
             member.setPassword(passwordEncoder.encode(updatedMember.getPassword()));
+        } else {
+            member.setPassword(updatedMember.getPassword());
         }
         member.setRoles(new HashSet<>(updatedMember.getRoles()));
         member.setEnabled(updatedMember.isEnabled());

@@ -94,7 +94,7 @@ class MemberProfileServiceTest {
     }
 
     @Test
-    void getAllMemberProfiles_WhenRecordsIsEmpty_ShouldReturnPagedOfBorrowingRecords() {
+    void getAllMemberProfiles_WhenRecordsIsEmpty_ShouldReturnEmptyPage() {
         List<MemberProfile> emptyPage = new ArrayList<>();
         Page<MemberProfile> expectedPage = new PageImpl<>(emptyPage, pageRequest, emptyPage.size());
 
