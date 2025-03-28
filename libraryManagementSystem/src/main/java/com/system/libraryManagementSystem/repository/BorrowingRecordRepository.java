@@ -16,7 +16,7 @@ public interface BorrowingRecordRepository extends JpaRepository<BorrowingRecord
     Page<BorrowingRecord> findBorrowingRecordByBookTitle(String title, Pageable pageable);
     @Query("SELECT br FROM BorrowingRecord br JOIN br.member m WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     Page<BorrowingRecord> findBorrowingRecordByMemberName(String name, Pageable pageable);
-    Page<BorrowingRecord> findByMemberEmail(String email, Pageable pageable);
+    Page<BorrowingRecord> findByMemberEmail(String email, Pageable pageable);       //does not allow partial matching, maybe need different name or use custom @Query
     @Query("SELECT br FROM BorrowingRecord br WHERE br.borrowDate BETWEEN :startDate AND :endDate")
     Page<BorrowingRecord> findBorrowingRecordByBorrowDate(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);  //by date, optional time
     @Query("SELECT br FROM BorrowingRecord br WHERE br.returnDate BETWEEN :startDate AND :endDate")

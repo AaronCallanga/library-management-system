@@ -1,4 +1,4 @@
-package com.system.libraryManagementSystem.integration;
+package com.system.libraryManagementSystem.integration.service;
 
 import com.system.libraryManagementSystem.model.Author;
 import com.system.libraryManagementSystem.model.Book;

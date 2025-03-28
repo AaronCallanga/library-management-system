@@ -1,4 +1,4 @@
-package com.system.libraryManagementSystem.controller;
+package com.system.libraryManagementSystem.integration.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.libraryManagementSystem.dto.AuthorDTO;

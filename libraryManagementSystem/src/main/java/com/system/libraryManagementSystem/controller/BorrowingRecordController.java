@@ -85,7 +85,6 @@ public class BorrowingRecordController { //maybe you can also create a api end p
             Authentication authentication
     ) {
         return new ResponseEntity<>(
-
                 borrowingRecordService.getBorrowingRecordByMemberEmail(authentication.getName(), page, size, sortDirection, sortField)
                         .map(BorrowingRecordMapper::toDTO),
                 HttpStatus.OK
