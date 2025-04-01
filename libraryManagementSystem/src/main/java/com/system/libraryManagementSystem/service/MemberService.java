@@ -25,6 +25,7 @@ import java.util.HashSet;
 
 @Service
 public class MemberService {
+    //maybe you can create more api for like, isEnabled, isCredentialsExpired etc
 
     @Autowired
     private MemberRepository memberRepository;
