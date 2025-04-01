@@ -332,10 +332,10 @@ class BorrowingRecordServiceIntegrationTest {       //integration tests focus on
         assertTrue(updatedRecord.isApproved(), "The borrowing record should be approved");
     }
 
-    @WithMockUser(username = "Admin", roles = "ADMIN") // Ensure proper role
+    @WithMockUser(username = "Admin", roles = "ADMIN")
     @Test
     void testApproveBorrowRequest_WhenRecordDoesNotExist_ShouldThrowException() {
-        Long invalidId = 999L; // Non-existent ID
+        Long invalidId = 999L;
 
         Exception exception = assertThrows(BorrowingRecordNotFound.class, () ->
                 borrowingRecordService.approveBorrowRequest(invalidId)
