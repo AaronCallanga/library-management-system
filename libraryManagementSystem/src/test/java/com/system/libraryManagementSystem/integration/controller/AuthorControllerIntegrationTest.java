@@ -6,6 +6,7 @@ import com.system.libraryManagementSystem.model.Author;
 import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.repository.AuthorRepository;
 import com.system.libraryManagementSystem.repository.BookRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc()
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)

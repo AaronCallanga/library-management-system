@@ -59,6 +59,8 @@ public class BorrowingRecordService {
         record.setBorrowDate(updatedBorrowingRecord.getBorrowDate());
         record.setReturnDate(updatedBorrowingRecord.getReturnDate());
 
+        record.setApproved(updatedBorrowingRecord.isApproved());    //member must not be able to set approved
+
         return borrowingRecordRepository.save(record);
     }
 

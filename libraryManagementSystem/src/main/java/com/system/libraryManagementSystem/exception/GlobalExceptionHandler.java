@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
-                "MEMBER PROFILE NOT FOUND",
+                "BORROWING RECORD NOT FOUND",
                 ex.getMessage()
         );
 
