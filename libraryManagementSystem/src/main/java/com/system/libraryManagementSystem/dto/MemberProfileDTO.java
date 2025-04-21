@@ -35,4 +35,7 @@ public class MemberProfileDTO {
 
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
+
+    @Email
+    private String memberEmail;
 }

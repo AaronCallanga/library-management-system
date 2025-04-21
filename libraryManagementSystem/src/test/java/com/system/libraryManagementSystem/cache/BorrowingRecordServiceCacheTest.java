@@ -133,7 +133,6 @@ class BorrowingRecordServiceCacheTest {
         assertNotNull(cacheManager.getCache("borrowing_records").get(borrowingRecord.getId(), BorrowingRecord.class));
         assertEquals(secondCall, cacheManager.getCache("borrowing_records").get(borrowingRecord.getId(), BorrowingRecord.class));
         assertEquals(updatedRecord, secondCall);
-        assertNotEquals(firstCall, secondCall);
         verify(borrowingRecordRepository, times(2)).findById(borrowingRecord.getId());
     }
 

@@ -25,7 +25,7 @@ public class MemberProfileMapper {
         memberProfileDTO.setMemberProfileId(memberProfile.getId());
         memberProfileDTO.setMemberId(memberProfile.getMember().getId());
         memberProfileDTO.setMemberName(memberProfile.getMember().getName());
-//        memberProfileDTO.setEmail(memberProfile.getEmail());
+        memberProfileDTO.setMemberEmail(memberProfile.getMember().getEmail());
         memberProfileDTO.setPhoneNumber(memberProfile.getPhoneNumber());
         memberProfileDTO.setAddress(memberProfile.getAddress());
         memberProfileDTO.setDateOfBirth(memberProfile.getDateOfBirth());
@@ -44,7 +44,6 @@ public class MemberProfileMapper {
         MemberProfile memberProfile = new MemberProfile();
 
         memberProfile.setId(memberProfileDTO.getMemberProfileId());
-//        memberProfile.setEmail(memberProfileDTO.getEmail());
         memberProfile.setPhoneNumber(memberProfileDTO.getPhoneNumber());
         memberProfile.setAddress(memberProfileDTO.getAddress());
         memberProfile.setDateOfBirth(memberProfileDTO.getDateOfBirth());
