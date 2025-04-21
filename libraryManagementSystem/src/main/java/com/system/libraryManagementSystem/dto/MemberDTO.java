@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@Builder
 public class MemberDTO {
 
     private Long id;

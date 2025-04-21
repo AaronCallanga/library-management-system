@@ -3,6 +3,7 @@ package com.system.libraryManagementSystem.controller;
 import com.system.libraryManagementSystem.dto.MemberDTO;
 import com.system.libraryManagementSystem.mapper.MemberMapper;
 import com.system.libraryManagementSystem.model.Member;
+import com.system.libraryManagementSystem.repository.BookRepository;
 import com.system.libraryManagementSystem.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -62,7 +62,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
 
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
-    public ResponseEntity<BorrowingRecordDTO> updateBorrowingRecordDTO(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
+    public ResponseEntity<BorrowingRecordDTO> updateBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
         BorrowingRecord newBorrowingRecord = BorrowingRecordMapper.toEntity(updatedBorrowingRecordDTO);
         BorrowingRecord updatedBorrowingRecord = borrowingRecordService.updateBorrowingRecord(newBorrowingRecord.getId(), newBorrowingRecord);
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(updatedBorrowingRecord), HttpStatus.OK);

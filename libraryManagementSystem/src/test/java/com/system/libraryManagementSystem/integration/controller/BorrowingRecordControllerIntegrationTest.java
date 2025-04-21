@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-@Transactional
+@Transactional                                                                  //Transactional in test, automatically rollback all operations. In normal class like services, it commit if there are no errors and rollback if there are errors/exceptions
 class BorrowingRecordControllerIntegrationTest {
 
     @Autowired
@@ -194,7 +194,7 @@ class BorrowingRecordControllerIntegrationTest {
 
     @WithMockUser(username = "admin", roles = "ADMIN")
     @Test
-    void updateBorrowingRecordDTO_ShouldReturnUpdatedRecord() throws Exception {
+    void updateBorrowingRecord_ShouldReturnUpdatedRecord() throws Exception {
         BorrowingRecordDTO updatedRecordDTO = BorrowingRecordDTO.builder()
                 .recordId(borrowingRecord1.getId())
                 .bookId(book.getId())

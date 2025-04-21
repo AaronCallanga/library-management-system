@@ -7,6 +7,7 @@ import com.system.libraryManagementSystem.model.Book;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.repository.BookRepository;
 import com.system.libraryManagementSystem.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 
 @Service
@@ -111,7 +113,7 @@ public class MemberService {
 
         if (member.getBorrowedBooks() != null) {
             member.getBorrowedBooks().remove(book);
-        }
+        } //else throw exception if member still not borrowed any books and the client is already returning
 
         return memberRepository.save(member);
     }
@@ -125,6 +127,7 @@ public class MemberService {
         if (member.getBorrowedBooks() == null) {
             member.setBorrowedBooks(new ArrayList<>()); // ✅ Ensure it is initialized
         }
+
 
         member.getBorrowedBooks().add(book);
         return memberRepository.save(member);

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT DISTINCT b FROM Book b JOIN b.author a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%', :name, '%'))")
@@ -16,4 +18,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b from Book b WHERE LOWER(b.genre) LIKE LOWER(CONCAT('%', :genre, '%'))")
     Page<Book> findBooksByGenre(String genre, Pageable pageable);
     Page<Book> findBooksByPublicationYear(int publicationYear, Pageable pageable);
+    Optional<Book> findByTitle(String title);
 }
