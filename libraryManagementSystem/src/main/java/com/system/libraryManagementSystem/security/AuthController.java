@@ -5,6 +5,8 @@ import com.system.libraryManagementSystem.dto.LoginRequestDTO;
 import com.system.libraryManagementSystem.mapper.LoginRequestMapper;
 import com.system.libraryManagementSystem.mapper.MemberMapper;
 import com.system.libraryManagementSystem.model.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
+    @Operation(summary = "Register", security = @SecurityRequirement(name = ""))
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody MemberDTO memberDTO) {
         Member member = MemberMapper.toEntity(memberDTO);
@@ -28,6 +31,7 @@ public class AuthController {
         return new ResponseEntity<>(authService.register(member), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Login", security = @SecurityRequirement(name = ""))
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         Member member = LoginRequestMapper.toEntity(loginRequestDTO);

@@ -6,6 +6,7 @@ import com.system.libraryManagementSystem.mapper.MemberProfileMapper;
 import com.system.libraryManagementSystem.model.MemberProfile;
 import com.system.libraryManagementSystem.service.MemberProfileService;
 import com.system.libraryManagementSystem.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,7 @@ public class MemberProfileController {
         this.memberProfileService = memberProfileService;
     }
 
+    @Operation(summary = "Get All Profiles")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<MemberProfileDTO>> getAllMemberProfiles(
@@ -51,6 +53,7 @@ public class MemberProfileController {
         );
     }
 
+    @Operation(summary = "Get Profile By ID")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<MemberProfileDTO> getMemberProfileById(@PathVariable Long id) {
@@ -58,6 +61,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(memberProfile), HttpStatus.OK);
     }
 
+    @Operation(summary = "Update Profile")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<MemberProfileDTO> updateMemberProfile(@Valid @RequestBody MemberProfileDTO updatedMemberProfileDTO) {
@@ -65,6 +69,8 @@ public class MemberProfileController {
         MemberProfile updatedMemberProfile = memberProfileService.updateMemberProfile(newMemberProfile.getId(), newMemberProfile);
         return new ResponseEntity<>(MemberProfileMapper.toDTO(updatedMemberProfile), HttpStatus.OK);
     }
+
+    @Operation(summary = "Create Profile")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") //this is for admin and librarian
     @PostMapping
     public ResponseEntity<MemberProfileDTO> saveNewMemberProfile(@Valid @RequestBody MemberProfileDTO memberProfileDTO) {
@@ -73,6 +79,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(savedMemberProfile), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Delete Profile")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMemberProfileById(@PathVariable Long id) {
@@ -80,6 +87,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Create Own Profile")
     @PreAuthorize("@memberService.isMemberOwner(#memberProfileDTO.memberId, authentication)") //can create their own member profile
     @PostMapping("/own")
     public ResponseEntity<MemberProfileDTO> saveOwnMemberProfile(@Valid @RequestBody MemberProfileDTO memberProfileDTO) {
@@ -88,6 +96,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(savedMemberProfile), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get Own Profile")
     @PreAuthorize("@memberProfileService.isMemberProfileOwner(#id, authentication)")
     @GetMapping("/own/{id}")
     public ResponseEntity<MemberProfileDTO> getOwnMemberProfile(@PathVariable Long id, Authentication authentication) {     //maybe can use email instead of id
@@ -95,6 +104,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(memberProfile), HttpStatus.OK);
     }
 
+    @Operation(summary = "Update Own Profile")
     @PreAuthorize("@memberProfileService.isMemberProfileOwner(#memberProfileDTO.memberProfileId, authentication)")
     @PutMapping("/update/own")
     public ResponseEntity<MemberProfileDTO> updateOwnMemberProfile(@RequestBody MemberProfileDTO memberProfileDTO) {
@@ -103,6 +113,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(MemberProfileMapper.toDTO(updatedMemberProfile), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get Profile By Name")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByMemberName(
@@ -119,6 +130,7 @@ public class MemberProfileController {
         );
     }
 
+    @Operation(summary = "Get Profile By Contact")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/contact")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByPhoneNumber(
@@ -135,6 +147,7 @@ public class MemberProfileController {
         );
     }
 
+    @Operation(summary = "Get Profile By Address")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/address")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfileByAddress(
@@ -151,6 +164,7 @@ public class MemberProfileController {
         );
     }
 
+    @Operation(summary = "Get Profile By Email")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/email")
     public ResponseEntity<MemberProfileDTO> getMemberProfileByMemberEmail(@RequestParam(defaultValue = "") String email) {
@@ -159,6 +173,7 @@ public class MemberProfileController {
         return new ResponseEntity<>(memberProfileDTO, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get Profile By Date Of Birth")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/birth-date")
     public ResponseEntity<Page<MemberProfileDTO>> getMemberProfilesByDateOfBirth(

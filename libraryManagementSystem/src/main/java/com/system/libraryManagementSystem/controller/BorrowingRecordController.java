@@ -4,6 +4,7 @@ import com.system.libraryManagementSystem.dto.BorrowingRecordDTO;
 import com.system.libraryManagementSystem.mapper.BorrowingRecordMapper;
 import com.system.libraryManagementSystem.model.BorrowingRecord;
 import com.system.libraryManagementSystem.service.BorrowingRecordService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         this.borrowingRecordService = borrowingRecordService;
     }
 
+    @Operation(summary = "Get All Records")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<BorrowingRecordDTO>> getAllBorrowingRecords(
@@ -45,6 +47,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Get Record By ID")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<BorrowingRecordDTO> getBorrowingRecordById(@PathVariable Long id) {
@@ -52,6 +55,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(borrowingRecord), HttpStatus.OK);
     }
 
+    @Operation(summary = "Create Record")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PostMapping
     public ResponseEntity<BorrowingRecordDTO> saveNewBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO recordDTO) {        //borrow request
@@ -60,6 +64,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(savedBorrowingRecord), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Update Record")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<BorrowingRecordDTO> updateBorrowingRecord(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
@@ -68,6 +73,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(updatedBorrowingRecord), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete Record")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBorrowingRecordById(@PathVariable Long id) {
@@ -75,6 +81,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get Own Record")
     @PreAuthorize("authentication.name == #authentication.name") // Ensures user can only access their own records
     @GetMapping("/own")
     public ResponseEntity<Page<BorrowingRecordDTO>> getOwnBorrowingRecord(
@@ -91,6 +98,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Send Borrow Request")
     @PreAuthorize("#recordDTO.memberEmail == authentication.name")
     @PostMapping("/request")
     public ResponseEntity<BorrowingRecordDTO> sendOwnBorrowingRequest(@Valid @RequestBody BorrowingRecordDTO recordDTO) {        //borrow request
@@ -99,6 +107,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(savedBorrowingRecord), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Update Own Record")
     @PreAuthorize("#updatedBorrowingRecordDTO.memberEmail == authentication.name")
     @PutMapping("/update/own")
     public ResponseEntity<BorrowingRecordDTO> updateOwnBorrowingRecordDTO(@Valid @RequestBody BorrowingRecordDTO updatedBorrowingRecordDTO) {
@@ -107,6 +116,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(BorrowingRecordMapper.toDTO(updatedBorrowingRecord), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete Own Record")
     @PreAuthorize("@borrowingRecordService.isMemberOwnerOfTheRecord(#id, authentication)")
     @DeleteMapping("/own/{id}")
     public ResponseEntity<Void> deleteOwnBorrowingRecordById(@PathVariable Long id) {
@@ -114,6 +124,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get Records By Book's Title")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBookTitle(
@@ -130,6 +141,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Get Records By Member's Name")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/member-name")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByMemberName(
@@ -146,6 +158,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Get Records By Borrow Date")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/borrow-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByBorrowDate(
@@ -164,6 +177,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
                 );
     }
 
+    @Operation(summary = "Get Records By Return Date")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/return-date")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordsByReturnDate(
@@ -182,6 +196,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Get Records By Member Email")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')") // Ensures user can only access their own records
     @GetMapping("/email")
     public ResponseEntity<Page<BorrowingRecordDTO>> getBorrowingRecordByMemberEmail(
@@ -198,6 +213,7 @@ public class BorrowingRecordController { //maybe you can also create a api end p
         );
     }
 
+    @Operation(summary = "Approve Borrow Request")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/approve/{id}")
     public ResponseEntity<String> approveBorrowRequest(@PathVariable Long id) {

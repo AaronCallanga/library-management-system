@@ -5,6 +5,7 @@ import com.system.libraryManagementSystem.mapper.MemberMapper;
 import com.system.libraryManagementSystem.model.Member;
 import com.system.libraryManagementSystem.repository.BookRepository;
 import com.system.libraryManagementSystem.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ public class MemberController {
         this.memberService = memberService;
 
     }
+    @Operation(summary = "Get All Members")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping
     public ResponseEntity<Page<MemberDTO>> getALlMembers(
@@ -40,6 +42,7 @@ public class MemberController {
         );
     }
 
+    @Operation(summary = "Get Member By ID")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<MemberDTO> getMemberById(@PathVariable Long id) {
@@ -47,6 +50,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @Operation(summary = "Create Member")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<MemberDTO> saveNewMember(@Valid @RequestBody MemberDTO memberDTO) {
@@ -56,6 +60,7 @@ public class MemberController {
     }
 
 
+    @Operation(summary = "Update Member")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<MemberDTO> updateMember(@Valid @RequestBody MemberDTO updatedMemberDTO) {
@@ -64,6 +69,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(updatedMember), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete Member")
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMemberById(@PathVariable Long id) {
@@ -71,6 +77,7 @@ public class MemberController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Operation(summary = "Get Own Member Details")
     @PreAuthorize("@memberService.isMemberOwner(#id, authentication)")
     @GetMapping("/own/{id}")
     public ResponseEntity<MemberDTO> getOwnMemberDetails(@PathVariable Long id) {  //automatically inject Authentication object, can use the email instead of id
@@ -79,6 +86,7 @@ public class MemberController {
     }
 
 //    @PreAuthorize("#memberDTO.email == authentication.name") //pwede rin
+    @Operation(summary = "Update Own Member Details")
     @PreAuthorize("@memberService.isMemberOwner(#memberDTO.id, authentication)")
     @PutMapping("/update/own")
     public ResponseEntity<MemberDTO> updateOwnMemberDetails(@RequestBody MemberDTO memberDTO) {
@@ -95,6 +103,7 @@ public class MemberController {
 //
 // The authorization check ensures that only the owner of the account (memberId)
 // can perform borrowing and returning actions.
+    @Operation(summary = "Borrow Book")
     @PreAuthorize("@memberService.isMemberOwner(#memberId, authentication)")
     @PostMapping("/{memberId}/borrow/{bookId}")
     public ResponseEntity<MemberDTO> borrowBook(@PathVariable Long memberId, @PathVariable Long bookId) {
@@ -102,6 +111,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @Operation(summary = "Return Book")
     @PreAuthorize("@memberService.isMemberOwner(#memberId, authentication)")
     @PostMapping("/{memberId}/return/{bookId}")
     public ResponseEntity<MemberDTO> returnBook(@PathVariable Long memberId, @PathVariable Long bookId) {
@@ -109,6 +119,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @Operation(summary = "Borrow Book - ADMIN/LIBRARIAN")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")       //for admin/librarian
     @PostMapping("/authorized/{memberId}/borrow/{bookId}")
     public ResponseEntity<MemberDTO> borrowBookWithAuthority(@PathVariable Long memberId, @PathVariable Long bookId) {
@@ -116,6 +127,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @Operation(summary = "Return Book - ADMIN/LIBRARIAN")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @PostMapping("/authorized/{memberId}/return/{bookId}")
     public ResponseEntity<MemberDTO> returnBookWithAuthority(@PathVariable Long memberId, @PathVariable Long bookId) {
@@ -123,6 +135,7 @@ public class MemberController {
         return new ResponseEntity<>(MemberMapper.toDTO(member), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get Members By Name")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/name")
     public ResponseEntity<Page<MemberDTO>> getMemberByName(
@@ -139,6 +152,7 @@ public class MemberController {
         );
     }
 
+    @Operation(summary = "Get Members By Borrowed Book's Title")
     @PreAuthorize("hasAnyRole('LIBRARIAN', 'ADMIN')")
     @GetMapping("/book-title")
     public ResponseEntity<Page<MemberDTO>> getMemberByBorrowedBookTitle(
