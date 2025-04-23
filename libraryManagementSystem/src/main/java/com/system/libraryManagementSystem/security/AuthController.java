@@ -7,14 +7,12 @@ import com.system.libraryManagementSystem.mapper.MemberMapper;
 import com.system.libraryManagementSystem.model.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,5 +35,18 @@ public class AuthController {
         Member member = LoginRequestMapper.toEntity(loginRequestDTO);
 
         return new ResponseEntity<>(authService.login(member), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Logout", security = @SecurityRequirement(name = ""))
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
+            String token = authHeader.substring(7);
+            return new ResponseEntity<>(authService.logout(token), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("No token provided", HttpStatus.BAD_REQUEST);
+        }
     }
 }

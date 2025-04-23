@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AuthService {
@@ -29,6 +30,7 @@ public class AuthService {
     AuthenticationManager authenticationManager;
     @Autowired
     private JwtService jwtService;
+
 
     public String register(Member member) {
         if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
@@ -71,6 +73,12 @@ public class AuthService {
         }
 
     }
+
+    public String logout(String token) {
+        jwtService.blacklistToken(token);
+        return "Logged out succesfully";
+    }
+
 //
 //    public String logout() {
 //

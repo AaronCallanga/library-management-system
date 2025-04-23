@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -25,6 +23,8 @@ public class JwtService {
 
     private final String SECRET_KEY = "CE899FEAB8E9D262B88FA266AA68ABBEF8F748D1C502E466BD9E2424BB51282F3707BCE469FBC9B039A652494B0CA938CF5E01157941E4C2C774C77473C3890D";
     private final Long EXPIRATION = TimeUnit.HOURS.toMillis(24);
+
+    private final Set<String> blacklistedToken = new HashSet<>();
 
 
     public String getToken(String email) {
@@ -66,5 +66,13 @@ public class JwtService {
     public boolean isTokenValid(String jwt) {
         Claims claims = getPayload(jwt);
         return claims.getExpiration().after(Date.from(Instant.now()));
+    }
+
+    public void blacklistToken(String token) {
+        blacklistedToken.add(token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistedToken.contains(token);
     }
 }

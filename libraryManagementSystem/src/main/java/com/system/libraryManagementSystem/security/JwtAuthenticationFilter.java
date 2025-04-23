@@ -1,5 +1,6 @@
 package com.system.libraryManagementSystem.security;
 
+import com.system.libraryManagementSystem.model.Book;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,22 +27,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     MemberDetailsService memberDetailsService;
 
+    public static final List<String> PUBLIC_URLS = List.of(
+            "/auth",
+            "/books",
+            "/authors",
+            "/v3/api-docs",
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/v3/api-docs.yaml"
+    );
+
+    public boolean isPublicEndpoint(String path) {
+        return PUBLIC_URLS.stream()
+                .anyMatch(path::startsWith);
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (isPublicEndpoint(request.getServletPath())) {
+            filterChain.doFilter(request, response);        //skips authentication
+            return;
+        }
+
         String authenticationHeader = request.getHeader("Authorization");
-
-        // Skip JWT validation for public endpoints
-//        if (request.getRequestURI().startsWith("/books") || request.getRequestURI().startsWith("/authors")) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-
         if (authenticationHeader == null || !authenticationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Missing or invalid Authorization header");
             return;
         }
         String jwt = authenticationHeader.substring(7);
         String memberEmail = jwtService.extractEmail(jwt);
+
+        if (jwtService.isTokenBlacklisted(jwt)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has been logged out");
+            return;
+        }
 
         if (memberEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails member = memberDetailsService.loadUserByUsername(memberEmail);
